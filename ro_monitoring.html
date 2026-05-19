@@ -1,0 +1,2821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Water Treatment Monitor — Savannah Brands</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#3d5a80;--blue-dk:#1e2d40;--blue-lt:#eef2f7;
+  --teal:#3d6b5a;--teal-lt:#edf4f0;
+  --red:#7e4040;--red-lt:#f7f0f0;
+  --amber:#7a5a2c;--amber-lt:#f4ecdc;
+  --green:#3a6348;--green-lt:#e8f2ec;
+  --purple:#574e7e;--purple-lt:#efecf7;
+  --elec:#7a5a2c;--elec-lt:#f4ecdc;
+  --water:#3a6478;--water-lt:#e8f2f6;
+  --gray:#6b7280;--border:rgba(0,0,0,.09);
+  --bg:#f3f2ef;
+  --r:14px;
+  --sh:0 2px 14px rgba(0,0,0,.07);
+}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:#1a1a2e;min-height:100vh;}
+input,button,select,textarea{font-family:inherit;}
+.hidden{display:none!important;}
+
+/* ── AUTH PAGES ── */
+.page-wrap{min-height:100vh;background:var(--blue-dk);display:flex;align-items:center;justify-content:center;padding:1.5rem;}
+.modal-card{background:#fff;border-radius:20px;padding:2rem;width:100%;max-width:360px;box-shadow:0 24px 60px rgba(0,0,0,.28);}
+.brand{text-align:center;margin-bottom:1.75rem;}
+.brand-logo{width:64px;height:64px;background:var(--blue);border-radius:18px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;color:white;font-size:28px;box-shadow:0 8px 24px rgba(0,0,0,.15);}
+.brand h1{font-size:22px;font-weight:800;color:var(--blue-dk);}
+.brand p{font-size:12px;color:var(--gray);margin-top:3px;}
+
+/* ── FIELDS ── */
+.fld{margin-bottom:14px;}
+.fld label{display:block;font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;}
+.fld input,.fld select,.fld textarea{width:100%;padding:12px 14px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:14px;color:var(--blue-dk);outline:none;transition:border-color .2s,box-shadow .2s;background:white;}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,74,138,.1);}
+.fld select{-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+.fld textarea{resize:vertical;min-height:72px;}
+.fld-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fld-row .fld{margin-bottom:0;}
+.fld-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.fld-row-3 .fld{margin-bottom:0;}
+.fld-row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.fld-row-4 .fld{margin-bottom:0;}
+
+/* ── BUTTONS ── */
+.btn-primary{width:100%;padding:14px;background:var(--blue);color:white;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;transition:opacity .15s,transform .1s;}
+.btn-primary:hover{opacity:.91;}
+.btn-primary:active{transform:scale(.98);}
+.btn-primary:disabled{background:#9ca3af;cursor:not-allowed;transform:none;}
+.btn-secondary{width:100%;padding:12px;background:transparent;color:var(--blue);border:1.5px solid #d1d5db;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;transition:background .15s;}
+.btn-secondary:hover{background:var(--blue-lt);}
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.err{background:var(--red-lt);color:var(--red);border-radius:10px;padding:10px 14px;font-size:12px;text-align:center;margin-top:10px;}
+
+/* ── PIN ── */
+.pin-dots{display:flex;justify-content:center;gap:14px;margin:20px 0 24px;}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid #cbd5e1;background:transparent;transition:all .15s;}
+.pin-dot.filled{background:var(--blue);border-color:var(--blue);}
+.pin-dot.err-dot{background:var(--red);border-color:var(--red);}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.pin-key{padding:16px 8px;border:1.5px solid #e5e7eb;border-radius:12px;background:white;font-size:20px;font-weight:700;color:#1a1a2e;cursor:pointer;text-align:center;transition:all .1s;-webkit-tap-highlight-color:transparent;}
+.pin-key:hover{border-color:var(--blue);background:var(--blue-lt);}
+.pin-key:active{transform:scale(.94);}
+.pin-key.del{font-size:16px;color:var(--gray);}
+.pin-key.wide{grid-column:1/3;font-size:14px;font-weight:600;color:var(--gray);}
+.pin-sub{font-size:12px;color:var(--gray);text-align:center;margin-bottom:4px;}
+
+/* ── LOADING ── */
+.loading-overlay{position:fixed;inset:0;background:var(--blue-dk);display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;gap:16px;z-index:100;}
+.lg-spin{width:40px;height:40px;border:3px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;}
+
+/* ── APP HEADER ── */
+.app-hdr{background:var(--blue-dk);color:white;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;box-shadow:0 2px 10px rgba(0,0,0,.3);}
+.hdr-left{display:flex;align-items:center;gap:12px;}
+.hdr-logo{width:38px;height:38px;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.hdr-title{font-size:15px;font-weight:800;letter-spacing:.1px;}
+.hdr-sub{font-size:11px;opacity:.72;margin-top:1px;}
+.hdr-date{font-size:10px;opacity:.5;margin-top:1px;}
+.hdr-menu-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:white;padding:8px 12px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600;flex-shrink:0;}
+.hdr-menu-btn:hover{background:rgba(255,255,255,.22);}
+
+/* ── ACCOUNT SHEET ── */
+.acct-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;display:flex;align-items:flex-end;}
+.acct-sheet{background:white;border-radius:20px 20px 0 0;padding:1.5rem;width:100%;max-width:480px;margin:0 auto;}
+.acct-hdr{display:flex;align-items:center;gap:14px;margin-bottom:1.25rem;}
+.acct-avatar{width:48px;height:48px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;color:white;font-size:18px;font-weight:700;flex-shrink:0;}
+.acct-name{font-size:16px;font-weight:700;}
+.acct-id{font-size:12px;color:var(--gray);}
+.acct-item{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.acct-item:last-of-type{border-bottom:none;}
+.acct-icon{width:38px;height:38px;border-radius:50%;background:var(--red-lt);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.acct-label{font-size:14px;font-weight:600;color:var(--red);}
+.acct-sub{font-size:12px;color:var(--gray);}
+
+/* ── MODULE TABS ── */
+.module-tabs{display:flex;background:white;border-bottom:2px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;box-shadow:0 2px 4px rgba(0,0,0,.05);}
+.module-tabs::-webkit-scrollbar{display:none;}
+.module-tab{flex:1;min-width:68px;padding:11px 4px 9px;font-size:11px;font-weight:700;color:var(--gray);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;white-space:nowrap;}
+.module-tab.active-ro{color:var(--blue);border-bottom-color:var(--blue);background:var(--blue-lt);}
+.module-tab.active-etp{color:var(--purple);border-bottom-color:var(--purple);background:var(--purple-lt);}
+.module-tab.active-co2{color:var(--amber);border-bottom-color:var(--amber);background:var(--amber-lt);}
+.module-tab.active-elec{color:var(--elec);border-bottom-color:var(--elec);background:var(--elec-lt);}
+.module-tab.active-maint{color:var(--teal);border-bottom-color:var(--teal);background:var(--teal-lt);}
+.module-tab.active-water{color:var(--water);border-bottom-color:var(--water);background:var(--water-lt);}
+
+/* ── PLANT SUB-TABS ── */
+.plant-subtabs{display:flex;background:#f8fafc;border-bottom:1px solid var(--border);}
+.plant-tab{flex:1;padding:10px 8px;font-size:12px;font-weight:700;color:var(--gray);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;}
+.plant-tab.active{color:var(--blue);border-bottom-color:var(--blue);background:white;}
+
+/* ── BODY ── */
+.app-body{padding:16px 16px 48px;}
+
+/* ── TODAY STATUS CARD ── */
+.today-card{background:white;border-radius:var(--r);border:1px solid var(--border);border-top:4px solid var(--blue);box-shadow:var(--sh);padding:18px 18px 16px;margin-bottom:16px;}
+#etp-section  .today-card{border-top-color:var(--purple);}
+#co2-section  .today-card{border-top-color:var(--amber);}
+#elec-section .today-card{border-top-color:var(--elec);}
+.today-hdr{font-size:13px;font-weight:700;color:var(--blue-dk);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.today-shifts{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.shift-pill{border-radius:12px;padding:16px 10px;text-align:center;border:1.5px solid #e5e7eb;background:#f8fafc;}
+.shift-pill.done{background:var(--green-lt);border-color:#86efac;}
+.shift-pill.pending{background:#fafafa;border-color:#e5e7eb;}
+.shift-time{font-size:14px;font-weight:800;margin-bottom:5px;color:var(--blue-dk);}
+.shift-pill.done .shift-time{color:var(--green);}
+.shift-status{font-size:11px;color:var(--gray);}
+.shift-pill.done .shift-status{color:var(--green);font-weight:600;}
+
+/* ── LOG BUTTON ── */
+.log-btn{width:100%;padding:15px;background:var(--blue);color:white;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px;box-shadow:0 3px 10px rgba(0,0,0,.12);letter-spacing:.2px;transition:opacity .15s,transform .1s;}
+.log-btn:hover{opacity:.92;transform:translateY(-1px);}
+.log-btn:active{transform:translateY(0);}
+.log-btn.etp-btn{background:var(--purple);box-shadow:0 3px 10px rgba(0,0,0,.12);}
+.log-btn.etp-btn:hover{background:#4c1d95;}
+.log-btn.co2-btn{background:var(--amber);box-shadow:0 3px 10px rgba(0,0,0,.12);}
+.log-btn.co2-btn:hover{background:#6d3c06;}
+.log-btn.elec-btn{background:var(--elec);box-shadow:0 3px 10px rgba(0,0,0,.12);}
+.log-btn.elec-btn:hover{background:#92400e;}
+.log-btn.water-btn{background:var(--water);box-shadow:0 3px 10px rgba(0,0,0,.12);}
+.log-btn.water-btn:hover{background:#2d4f60;}
+
+/* ── ENTRY FORM CARD ── */
+.form-card{background:white;border-radius:var(--r);border:1px solid var(--border);border-top:4px solid var(--blue);box-shadow:var(--sh);padding:18px 16px;margin-bottom:16px;}
+#etp-section  .form-card{border-top-color:var(--purple);}
+#co2-section  .form-card{border-top-color:var(--amber);}
+#elec-section .form-card{border-top-color:var(--elec);}
+#maint-section .form-card{border-top-color:var(--teal);}
+.form-card h3{font-size:16px;font-weight:800;color:var(--blue-dk);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.section-sep{font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 10px;padding-top:12px;border-top:1px solid var(--border);}
+.form-msg{margin-top:12px;font-size:12px;border-radius:10px;padding:10px 14px;line-height:1.5;}
+.form-msg.ok{background:var(--teal-lt);color:var(--teal);}
+.form-msg.bad{background:var(--red-lt);color:var(--red);}
+
+/* ── STATUS SELECT ── */
+select.status-ok{background-color:#f0fdf4;border-color:#86efac!important;color:var(--green);}
+select.status-warn{background-color:#fffbeb;border-color:#fcd34d!important;color:var(--amber);}
+select.status-bad{background-color:#fef2f2;border-color:#fca5a5!important;color:var(--red);}
+
+/* ── TOGGLES ── */
+.ok-toggle{display:flex;border-radius:10px;overflow:hidden;border:1.5px solid #e5e7eb;}
+.ok-btn{flex:1;padding:12px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:#f9fafb;color:var(--gray);transition:all .1s;}
+.ok-btn.sel-ok{background:var(--green-lt);color:var(--green);}
+.ok-btn.sel-notok{background:var(--red-lt);color:var(--red);}
+.compliance-toggle{display:flex;border-radius:10px;overflow:hidden;border:1.5px solid #e5e7eb;margin-top:5px;}
+.comp-btn{flex:1;padding:11px 8px;font-size:13px;font-weight:700;border:none;cursor:pointer;background:#f9fafb;color:var(--gray);transition:all .1s;text-align:center;}
+.comp-btn.sel-yes{background:var(--green-lt);color:var(--green);}
+.comp-btn.sel-partial{background:var(--amber-lt);color:var(--amber);}
+.comp-btn.sel-no{background:var(--red-lt);color:var(--red);}
+
+/* ── TANK LEVEL INPUT ── */
+.tank-input-wrap{position:relative;}
+.tank-capacity{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--gray);pointer-events:none;}
+
+/* ── PARAM HINTS ── */
+.param-hint{font-size:10px;color:var(--gray);margin-top:3px;}
+.param-hint.out{color:var(--red);font-weight:600;}
+
+/* ── ALERT BANNER ── */
+.alert-banner{background:var(--red-lt);border:1px solid #fca5a5;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--red);font-weight:600;}
+
+/* ── RECORDS CARD ── */
+.records-card{background:white;border-radius:var(--r);border:1px solid var(--border);border-top:4px solid var(--blue);box-shadow:var(--sh);overflow:hidden;margin-bottom:16px;}
+#etp-section  .records-card{border-top-color:var(--purple);}
+#co2-section  .records-card{border-top-color:var(--amber);}
+#elec-section  .records-card{border-top-color:var(--elec);}
+#water-section .today-card{border-top-color:var(--water);}
+#water-section .form-card{border-top-color:var(--water);}
+#water-section .records-card{border-top-color:var(--water);}
+.records-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.records-hdr h3{font-size:15px;font-weight:800;color:var(--blue-dk);}
+.refresh-btn{background:var(--blue-lt);color:var(--blue);border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;}
+.refresh-btn:hover{opacity:.8;}
+.refresh-btn.etp-refresh{background:var(--purple-lt);color:var(--purple);}
+.refresh-btn.co2-refresh{background:var(--amber-lt);color:var(--amber);}
+.refresh-btn.elec-refresh{background:var(--elec-lt);color:var(--elec);}
+.refresh-btn.water-refresh{background:var(--water-lt);color:var(--water);}
+.rec-item{padding:14px 18px;border-bottom:1px solid var(--border);}
+.rec-item:last-of-type{border-bottom:none;}
+.rec-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.rec-datetime{font-size:14px;font-weight:800;color:#1a1a2e;}
+.rec-by{font-size:11px;color:var(--gray);}
+.rec-tanks{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;}
+.rec-tanks-4{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px;}
+.tank-pill{background:#f8fafc;border-radius:8px;padding:7px 8px;text-align:center;border:1px solid var(--border);}
+.tank-lbl{font-size:9px;color:var(--gray);font-weight:700;text-transform:uppercase;}
+.tank-val{font-size:13px;font-weight:800;color:var(--blue-dk);}
+.rec-badges{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;}
+.rbadge{padding:3px 9px;border-radius:8px;font-size:10px;font-weight:700;}
+.rbadge.ok{background:var(--green-lt);color:var(--green);}
+.rbadge.warn{background:var(--amber-lt);color:var(--amber);}
+.rbadge.bad{background:var(--red-lt);color:var(--red);}
+.rbadge.info{background:var(--blue-lt);color:var(--blue);}
+.rbadge.compliant{background:var(--green-lt);color:var(--green);font-size:11px;padding:4px 10px;}
+.rbadge.non-compliant{background:var(--red-lt);color:var(--red);font-size:11px;padding:4px 10px;}
+.rbadge.partial{background:var(--amber-lt);color:var(--amber);font-size:11px;padding:4px 10px;}
+.rec-params{display:flex;flex-wrap:wrap;gap:8px;margin-top:5px;}
+.param-chip{font-size:11px;color:var(--gray);}
+.param-chip strong{color:var(--blue-dk);}
+.rec-comment{font-size:11px;color:var(--gray);font-style:italic;margin-top:4px;}
+.no-records{padding:32px;text-align:center;color:var(--gray);font-size:13px;}
+
+/* ── CO2 MODULE ── */
+.vol-display{background:white;border-radius:var(--r);border:1px solid var(--border);border-top:4px solid var(--amber);box-shadow:var(--sh);padding:18px 18px;margin-bottom:16px;}
+.vol-hdr{font-size:12px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.vol-main{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:10px;}
+.vol-kg{font-size:36px;font-weight:800;color:var(--blue-dk);line-height:1;}
+.vol-unit{font-size:13px;color:var(--gray);margin-left:4px;margin-bottom:4px;}
+.vol-bar-bg{height:14px;background:#e5e7eb;border-radius:8px;overflow:hidden;}
+.vol-bar-fill{height:100%;border-radius:8px;transition:width .4s;}
+.vol-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--gray);margin-top:5px;}
+.pres-hint{font-size:10px;color:var(--gray);margin-top:3px;}
+.pres-hint.out-range{color:var(--red);font-weight:700;}
+.pres-hint.in-range{color:var(--green);font-weight:600;}
+input.pres-ok{border-color:#86efac!important;background:#f0fdf4!important;}
+input.pres-warn{border-color:#fca5a5!important;background:#fef2f2!important;}
+
+/* ── ELECTRICITY MODULE ── */
+.today-status{font-size:13px;font-weight:600;padding:6px 0 2px;margin-top:4px;}
+.meter-prev{font-size:11px;color:var(--gray);margin-top:3px;margin-bottom:6px;}
+.meter-prev strong{color:var(--blue-dk);}
+.elec-rec-item{padding:14px 18px;border-bottom:1px solid var(--border);}
+.elec-rec-item:last-of-type{border-bottom:none;}
+.elec-rec-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.elec-rec-date{font-size:14px;font-weight:800;}
+.elec-rec-by{font-size:11px;color:var(--gray);}
+.elec-meter-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f3f4f6;}
+.elec-meter-row:last-of-type{border-bottom:none;}
+.elec-meter-lbl{font-size:11px;color:var(--gray);flex:1;}
+.elec-meter-val{font-size:13px;font-weight:800;color:var(--blue-dk);margin-left:8px;}
+.elec-meter-diff{font-size:10px;font-weight:700;padding:2px 7px;border-radius:7px;margin-left:6px;flex-shrink:0;}
+.elec-meter-diff.up{background:var(--amber-lt);color:var(--amber);}
+.elec-meter-diff.first{background:var(--blue-lt);color:var(--blue);}
+
+/* ── MAINTENANCE MODULE ── */
+.maint-subtabs{display:flex;background:#f8fafc;border-bottom:1px solid var(--border);}
+.maint-tab{flex:1;padding:10px 8px;font-size:12px;font-weight:700;color:var(--gray);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;display:flex;align-items:center;justify-content:center;gap:5px;}
+.maint-tab.active{color:var(--teal);border-bottom-color:var(--teal);background:white;}
+.maint-badge{background:var(--red);color:white;border-radius:9px;padding:1px 5px;font-size:10px;font-weight:700;min-width:16px;text-align:center;}
+.welcome-card{background:linear-gradient(135deg,var(--teal),#0a4a39);border-radius:var(--r);padding:20px;margin-bottom:16px;color:white;box-shadow:0 4px 16px rgba(0,0,0,.12);}
+.welcome-card h2{font-size:19px;font-weight:800;margin-bottom:3px;}
+.welcome-card p{font-size:12px;opacity:.75;}
+.stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px;}
+.stat-card{background:white;border-radius:12px;padding:14px 16px;border:1px solid var(--border);box-shadow:var(--sh);}
+.stat-card:nth-child(1){border-top:4px solid var(--red);}
+.stat-card:nth-child(2){border-top:4px solid var(--amber);}
+.stat-card:nth-child(3){border-top:4px solid var(--green);}
+.stat-card:nth-child(4){border-top:4px solid var(--blue);}
+.stat-label{font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+.stat-val{font-size:28px;font-weight:800;color:var(--blue-dk);line-height:1;}
+.stat-val.red{color:var(--red);}
+.stat-val.amber{color:var(--amber);}
+.stat-val.green{color:var(--green);}
+.stat-sub{font-size:10px;color:var(--gray);margin-top:3px;}
+.sec-hdr{font-size:12px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 10px;}
+.due-item{background:white;border-radius:12px;padding:14px 16px;border:1px solid var(--border);box-shadow:var(--sh);margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:box-shadow .15s;}
+.due-item:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);}
+.due-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.due-dot.overdue{background:var(--red);}
+.due-dot.due{background:var(--amber);}
+.due-dot.ok{background:var(--green);}
+.due-item-main{flex:1;min-width:0;}
+.due-item-task{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.due-item-equip{font-size:11px;color:var(--gray);margin-top:2px;}
+.due-item-freq{font-size:10px;font-weight:700;padding:3px 8px;border-radius:9px;flex-shrink:0;}
+.freq-daily{background:var(--blue-lt);color:var(--blue);}
+.freq-weekly{background:var(--teal-lt);color:var(--teal);}
+.freq-monthly{background:var(--amber-lt);color:var(--amber);}
+.freq-quarterly{background:var(--purple-lt);color:var(--purple);}
+.freq-6months{background:var(--red-lt);color:var(--red);}
+.freq-yearly{background:#f3f4f6;color:#374151;}
+.equip-card{background:white;border-radius:12px;border:1px solid var(--border);box-shadow:var(--sh);margin-bottom:12px;overflow:hidden;}
+.equip-hdr{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .1s;}
+.equip-hdr:hover{background:#f8fafc;}
+.equip-hdr-left{display:flex;align-items:center;gap:12px;}
+.equip-icon{font-size:22px;}
+.equip-name{font-size:14px;font-weight:800;color:var(--blue-dk);}
+.equip-counts{display:flex;gap:6px;align-items:center;}
+.count-badge{padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;}
+.count-badge.ov{background:var(--red-lt);color:var(--red);}
+.count-badge.du{background:var(--amber-lt);color:var(--amber);}
+.count-badge.ok{background:var(--green-lt);color:var(--green);}
+.equip-chevron{color:var(--gray);font-size:12px;transition:transform .2s;}
+.equip-chevron.open{transform:rotate(180deg);}
+.equip-tasks{display:none;border-top:1px solid var(--border);}
+.equip-tasks.open{display:block;}
+.task-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);}
+.task-item:last-of-type{border-bottom:none;}
+.task-cb{width:22px;height:22px;border-radius:6px;border:2px solid #d1d5db;background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .1s;}
+.task-cb.checked{background:var(--teal);border-color:var(--teal);}
+.task-cb.checked::after{content:'✓';color:white;font-size:13px;font-weight:700;}
+.task-cb.overdue{border-color:var(--red);}
+.task-cb.due{border-color:var(--amber);}
+.task-info{flex:1;min-width:0;}
+.task-name{font-size:13px;font-weight:600;color:#1a1a2e;line-height:1.3;}
+.task-meta{font-size:10px;color:var(--gray);margin-top:3px;}
+.task-status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.log-submit-bar{position:fixed;bottom:0;left:0;right:0;padding:12px 16px;background:white;border-top:1px solid var(--border);z-index:9;max-width:480px;margin:0 auto;}
+.log-submit-btn{width:100%;padding:14px;background:var(--teal);color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,.12);}
+.log-submit-btn:disabled{background:#9ca3af;box-shadow:none;}
+.log-extra{background:white;border-top:1px solid var(--border);padding:14px 16px;}
+.hist-filter{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;}
+.hist-chip{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;border:1.5px solid #e5e7eb;background:white;cursor:pointer;white-space:nowrap;color:var(--gray);}
+.hist-chip.active{background:var(--teal);color:white;border-color:var(--teal);}
+.hist-card{background:white;border-radius:12px;border:1px solid var(--border);box-shadow:var(--sh);overflow:hidden;margin-bottom:10px;}
+.hist-hdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.hist-date{font-size:13px;font-weight:800;color:var(--blue-dk);}
+.hist-by{font-size:11px;color:var(--gray);}
+.hist-equip{font-size:12px;font-weight:700;color:var(--gray);padding:8px 16px 4px;text-transform:uppercase;letter-spacing:.3px;}
+.hist-task-row{padding:4px 16px 4px 30px;font-size:13px;color:#374151;display:flex;align-items:center;gap:6px;}
+.hist-task-row::before{content:'✓';color:var(--green);font-weight:700;margin-left:-14px;margin-right:4px;}
+.hist-notes{padding:6px 16px 12px;font-size:11px;color:var(--gray);font-style:italic;}
+
+/* ── MODULE GRID HOME ── */
+.module-tabs{display:none;}
+.mod-grid-wrap{padding:14px 16px 28px;}
+.mod-grid-label{font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px;}
+.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.mod-card{background:white;border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--sh);overflow:hidden;cursor:pointer;transition:box-shadow .15s,transform .1s;-webkit-tap-highlight-color:transparent;}
+.mod-card:hover{box-shadow:0 6px 22px rgba(0,0,0,.12);transform:translateY(-2px);}
+.mod-card:active{transform:scale(.98);}
+.mod-card-full{grid-column:1/-1;}
+.mod-card-accent{height:5px;}
+.mod-card-body{padding:14px 14px 8px;display:flex;align-items:flex-start;gap:12px;}
+.mod-icon-sq{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.mod-icon-sq.blue{background:var(--blue-lt);}
+.mod-icon-sq.purple{background:var(--purple-lt);}
+.mod-icon-sq.amber{background:var(--amber-lt);}
+.mod-icon-sq.elec{background:var(--elec-lt);}
+.mod-icon-sq.teal{background:var(--teal-lt);}
+.mod-card-name{font-size:13px;font-weight:800;color:var(--blue-dk);margin-bottom:3px;line-height:1.3;}
+.mod-card-sub{font-size:10px;color:var(--gray);line-height:1.5;}
+.mod-card-footer{padding:6px 14px 13px;display:flex;align-items:center;justify-content:space-between;}
+.mod-card-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:8px;}
+.mod-card-arrow{font-size:20px;color:#d1d5db;line-height:1;}
+
+/* ── MODULE BACK BAR ── */
+.mod-back-bar{background:white;border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:12px;}
+.mod-back-btn{background:none;border:1.5px solid var(--border);color:var(--blue-dk);padding:7px 12px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:background .15s;}
+.mod-back-btn:hover{background:var(--blue-lt);}
+.mod-back-title{font-size:14px;font-weight:800;color:var(--blue-dk);}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOADING ═══ -->
+<div id="pg-loading" class="loading-overlay">
+  <div class="lg-spin"></div>
+  <p style="font-size:14px;opacity:.8">Water Treatment Monitor</p>
+</div>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="pg-login" class="page-wrap hidden">
+  <div class="modal-card">
+    <div class="brand">
+      <div class="brand-logo">💧</div>
+      <h1>Water Treatment</h1>
+      <p>Savannah Brands Co. Ltd</p>
+    </div>
+    <div class="fld">
+      <label>Email Address</label>
+      <input id="li-email" type="email" placeholder="your@email.com" autocomplete="email">
+    </div>
+    <div class="fld">
+      <label>Staff ID</label>
+      <input id="li-staffid" type="text" placeholder="e.g. SB169" autocomplete="off" style="text-transform:uppercase">
+    </div>
+    <button class="btn-primary" onclick="doLogin()">
+      <span id="li-btn-txt">Continue</span>
+      <span id="li-spin" class="spinner hidden"></span>
+    </button>
+    <div id="li-err" class="err hidden"></div>
+    <div style="text-align:center;margin-top:18px;padding-top:16px;border-top:1px solid #e5e7eb;">
+      <p style="font-size:11px;color:var(--gray);margin-bottom:8px;">Want to explore first?</p>
+      <button onclick="demoLogin()" style="width:100%;padding:11px;background:var(--elec-lt);color:var(--elec);border:1.5px solid var(--elec);border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">
+        🎭 View Demo Layout
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PIN ═══ -->
+<div id="pg-pin" class="page-wrap hidden">
+  <div class="modal-card">
+    <div class="brand">
+      <div class="brand-logo">🔐</div>
+      <h1>Enter PIN</h1>
+      <p id="pin-user-label">Verifying identity</p>
+    </div>
+    <p class="pin-sub">Enter your 4-digit PIN</p>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-grid">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <button class="pin-key wide" onclick="pinKey('0')">0</button>
+      <button class="pin-key del" onclick="pinDel()">⌫</button>
+    </div>
+    <div id="pin-err" class="err hidden"></div>
+    <button class="btn-secondary" onclick="showPage('pg-login')">← Back</button>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="pg-app" class="hidden">
+
+  <!-- Header -->
+  <div class="app-hdr">
+    <div class="hdr-left">
+      <div class="hdr-logo" id="hdr-logo">💧</div>
+      <div>
+        <div class="hdr-title" id="hdr-title">Water Treatment</div>
+        <div class="hdr-sub" id="hdr-sub">Savannah Brands</div>
+        <div class="hdr-date" id="hdr-date"></div>
+      </div>
+    </div>
+    <button class="hdr-menu-btn" onclick="toggleAcct()">☰</button>
+  </div>
+
+  <!-- Account Sheet -->
+  <div id="acct-overlay" class="acct-overlay hidden" onclick="closeAcctBg(event)">
+    <div class="acct-sheet">
+      <div class="acct-hdr">
+        <div class="acct-avatar" id="acct-av">?</div>
+        <div>
+          <div class="acct-name" id="acct-name">—</div>
+          <div class="acct-id" id="acct-id">—</div>
+        </div>
+      </div>
+      <div class="acct-item" onclick="doLogout()">
+        <div class="acct-icon">🚪</div>
+        <div><div class="acct-label">Sign Out</div><div class="acct-sub">Return to login</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demo banner -->
+  <div id="demo-banner" class="hidden" style="background:#fef3c7;border-bottom:2px solid var(--elec);color:var(--elec);text-align:center;padding:6px 16px;font-size:11px;font-weight:700;letter-spacing:.3px;position:sticky;top:52px;z-index:9;">
+    🎭 DEMO MODE — Sample data only. Not connected to any server.
+  </div>
+
+  <!-- hidden tab-state tracking for JS -->
+  <div class="module-tabs" aria-hidden="true">
+    <button class="module-tab active-ro" id="mod-tab-ro">🌊 RO</button>
+    <button class="module-tab" id="mod-tab-etp">♻️ ETP</button>
+    <button class="module-tab" id="mod-tab-co2">🧪 CO₂</button>
+    <button class="module-tab" id="mod-tab-elec">⚡ Electricity</button>
+    <button class="module-tab" id="mod-tab-maint">🔧 Maintenance</button>
+    <button class="module-tab" id="mod-tab-water">💧 Water</button>
+  </div>
+
+  <!-- ── MODULE SELECTION GRID ── -->
+  <div id="mod-grid-view">
+    <div class="mod-grid-wrap">
+      <div class="mod-grid-label">Select a Module</div>
+      <div class="mod-grid">
+
+        <div class="mod-card" onclick="openModule('ro')">
+          <div class="mod-card-accent" style="background:var(--blue)"></div>
+          <div class="mod-card-body">
+            <div class="mod-icon-sq blue">🌊</div>
+            <div>
+              <div class="mod-card-name">RO Monitoring</div>
+              <div class="mod-card-sub">2000 L/Hr · 4000 L/Hr</div>
+            </div>
+          </div>
+          <div class="mod-card-footer">
+            <span class="mod-card-badge" style="background:var(--blue-lt);color:var(--blue)" id="mcard-ro-badge">Open</span>
+            <span class="mod-card-arrow">›</span>
+          </div>
+        </div>
+
+        <div class="mod-card" onclick="openModule('etp')">
+          <div class="mod-card-accent" style="background:var(--purple)"></div>
+          <div class="mod-card-body">
+            <div class="mod-icon-sq purple">♻️</div>
+            <div>
+              <div class="mod-card-name">ETP Monitoring</div>
+              <div class="mod-card-sub">Effluent Treatment Plant</div>
+            </div>
+          </div>
+          <div class="mod-card-footer">
+            <span class="mod-card-badge" style="background:var(--purple-lt);color:var(--purple)" id="mcard-etp-badge">Open</span>
+            <span class="mod-card-arrow">›</span>
+          </div>
+        </div>
+
+        <div class="mod-card" onclick="openModule('co2')">
+          <div class="mod-card-accent" style="background:var(--amber)"></div>
+          <div class="mod-card-body">
+            <div class="mod-icon-sq amber">🧪</div>
+            <div>
+              <div class="mod-card-name">Bulk CO₂</div>
+              <div class="mod-card-sub">CO₂ storage tank</div>
+            </div>
+          </div>
+          <div class="mod-card-footer">
+            <span class="mod-card-badge" style="background:var(--amber-lt);color:var(--amber)" id="mcard-co2-badge">Open</span>
+            <span class="mod-card-arrow">›</span>
+          </div>
+        </div>
+
+        <div class="mod-card" onclick="openModule('elec')">
+          <div class="mod-card-accent" style="background:var(--elec)"></div>
+          <div class="mod-card-body">
+            <div class="mod-icon-sq elec">⚡</div>
+            <div>
+              <div class="mod-card-name">Electricity</div>
+              <div class="mod-card-sub">WH 34/35/25 · 26 · 36 · 58</div>
+            </div>
+          </div>
+          <div class="mod-card-footer">
+            <span class="mod-card-badge" style="background:var(--elec-lt);color:var(--elec)" id="mcard-elec-badge">Open</span>
+            <span class="mod-card-arrow">›</span>
+          </div>
+        </div>
+
+        <div class="mod-card" onclick="openModule('water')">
+          <div class="mod-card-accent" style="background:var(--water)"></div>
+          <div class="mod-card-body">
+            <div class="mod-icon-sq" style="background:var(--water-lt)">💧</div>
+            <div>
+              <div class="mod-card-name">Water Meters</div>
+              <div class="mod-card-sub">WH 34 · WH 36 · Post-Raw · Tanks</div>
+            </div>
+          </div>
+          <div class="mod-card-footer">
+            <span class="mod-card-badge" style="background:var(--water-lt);color:var(--water)" id="mcard-water-badge">Open</span>
+            <span class="mod-card-arrow">›</span>
+          </div>
+        </div>
+
+        <div class="mod-card" onclick="openModule('maint')">
+          <div class="mod-card-accent" style="background:var(--teal)"></div>
+          <div class="mod-card-body">
+            <div class="mod-icon-sq teal">🔧</div>
+            <div>
+              <div class="mod-card-name">Engineering Maintenance</div>
+              <div class="mod-card-sub">18 equipment groups · Dashboard · Log Tasks · History</div>
+            </div>
+          </div>
+          <div class="mod-card-footer">
+            <span class="mod-card-badge" style="background:var(--teal-lt);color:var(--teal)" id="mcard-maint-badge">Open</span>
+            <span class="mod-card-arrow">›</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       RO SECTION
+  ══════════════════════════════════════════ -->
+  <div id="ro-section">
+    <div class="mod-back-bar">
+      <button class="mod-back-btn" onclick="showModGrid()">← Back</button>
+      <span class="mod-back-title">🌊 RO Monitoring</span>
+    </div>
+    <!-- Plant Sub-Tabs -->
+    <div class="plant-subtabs">
+      <button class="plant-tab active" id="tab-2000" onclick="switchPlant('2000')">🔵 2000 L/Hr</button>
+      <button class="plant-tab" id="tab-4000" onclick="switchPlant('4000')">🟢 4000 L/Hr</button>
+    </div>
+
+    <div class="app-body">
+      <div id="ro-alert-banner" class="alert-banner hidden"></div>
+
+      <!-- Today Status -->
+      <div class="today-card">
+        <div class="today-hdr">
+          <span>Today's RO Readings</span>
+          <span id="ro-today-date" style="font-size:11px;color:var(--gray);font-weight:400;text-transform:none;letter-spacing:0;"></span>
+        </div>
+        <div class="today-shifts">
+          <div class="shift-pill pending" id="ro-shift-0800">
+            <div class="shift-time">0800 HRS</div>
+            <div class="shift-status" id="ro-s0800">Not logged</div>
+          </div>
+          <div class="shift-pill pending" id="ro-shift-1730">
+            <div class="shift-time">1730 HRS</div>
+            <div class="shift-status" id="ro-s1730">Not logged</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Log Button -->
+      <div id="ro-log-btn-wrap">
+        <button class="log-btn" onclick="showRoForm()">+ Log RO Reading</button>
+      </div>
+
+      <!-- RO Entry Form -->
+      <div id="ro-entry-form" class="form-card hidden">
+        <h3>📋 New RO Reading — <span id="ro-form-plant-lbl">2000 L/Hr</span></h3>
+        <div class="fld-row">
+          <div class="fld"><label>Date</label><input type="date" id="rf-date"></div>
+          <div class="fld"><label>Time Slot</label>
+            <select id="rf-time">
+              <option value="0800HRS">0800 HRS (Morning)</option>
+              <option value="1730HRS">1730 HRS (Afternoon)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-sep">Tank Water Levels (Litres)</div>
+        <div class="fld-row-3">
+          <div class="fld"><label>Raw Water</label><input type="number" id="rf-raw" placeholder="0" min="0"></div>
+          <div class="fld"><label>UF Tank</label><input type="number" id="rf-uf" placeholder="0" min="0"></div>
+          <div class="fld"><label>RO Tank</label><input type="number" id="rf-ro-tank" placeholder="0" min="0"></div>
+        </div>
+
+        <div class="section-sep">Equipment Status</div>
+        <div class="fld">
+          <label>UF Plant Condition</label>
+          <select id="rf-uf-cond" onchange="colorStatus(this)">
+            <option>Functioning well</option><option>In good condition</option>
+            <option>Minor issue</option><option>Not so well</option>
+            <option>Not functioning</option><option>Under maintenance</option>
+          </select>
+        </div>
+        <div class="fld">
+          <label>RO Plant Condition</label>
+          <select id="rf-ro-cond" onchange="colorStatus(this)">
+            <option>Functioning well</option><option>In good condition</option>
+            <option>Minor issue</option><option>Not so well</option>
+            <option>Not functioning</option><option>Under maintenance</option>
+          </select>
+        </div>
+        <div class="fld">
+          <label>DMF Filters</label>
+          <select id="rf-dmf" onchange="colorStatus(this)">
+            <option>Functioning well</option><option>In good condition</option>
+            <option>Slight leakage</option><option>Leakage</option>
+            <option>Needs backwash</option><option>Under maintenance</option>
+          </select>
+        </div>
+        <div class="fld">
+          <label>Antiscalant Dozing</label>
+          <select id="rf-antiscalant" onchange="colorStatus(this)">
+            <option>Good level</option><option>Medium level</option>
+            <option>Low level</option><option>Needs refill</option><option>Empty - Refilled</option>
+          </select>
+        </div>
+
+        <div class="section-sep">Pumps</div>
+        <div class="fld">
+          <label>Raw Water Pump</label>
+          <div class="ok-toggle">
+            <button class="ok-btn sel-ok" onclick="setToggle('rf-raw-pump','Ok',this)">✓ Ok</button>
+            <button class="ok-btn" onclick="setToggle('rf-raw-pump','Not ok',this)">✗ Not ok</button>
+          </div>
+          <input type="hidden" id="rf-raw-pump" value="Ok">
+        </div>
+        <div class="fld" style="margin-top:10px;">
+          <label>High Pressure Pump</label>
+          <div class="ok-toggle">
+            <button class="ok-btn sel-ok" onclick="setToggle('rf-hp-pump','Ok',this)">✓ Ok</button>
+            <button class="ok-btn" onclick="setToggle('rf-hp-pump','Not ok',this)">✗ Not ok</button>
+          </div>
+          <input type="hidden" id="rf-hp-pump" value="Ok">
+        </div>
+        <div class="fld" style="margin-top:10px;">
+          <label>Membranes</label>
+          <select id="rf-membranes" onchange="colorStatus(this)">
+            <option>Functioning well</option><option>In good condition</option>
+            <option>Needs cleaning</option><option>CIP in progress</option><option>Replaced</option>
+          </select>
+        </div>
+        <div class="fld hidden" id="rf-ctrl-wrap" style="margin-top:10px;">
+          <label>Control Panel</label>
+          <div class="ok-toggle">
+            <button class="ok-btn sel-ok" onclick="setToggle('rf-ctrl','Ok',this)">✓ Ok</button>
+            <button class="ok-btn" onclick="setToggle('rf-ctrl','Not ok',this)">✗ Not ok</button>
+          </div>
+          <input type="hidden" id="rf-ctrl" value="Ok">
+        </div>
+
+        <div class="section-sep">Permeate Water Parameters</div>
+        <div class="fld-row">
+          <div class="fld"><label>Clean Water Ratio (%)</label><input type="number" id="rf-ratio" placeholder="e.g. 67" min="0" max="100" step="0.1"></div>
+          <div class="fld"><label>pH</label><input type="number" id="rf-ph" placeholder="7.0" min="0" max="14" step="0.1"></div>
+        </div>
+
+        <div class="section-sep">Sign Off</div>
+        <div class="fld-row">
+          <div class="fld"><label>Checked By</label><input type="text" id="rf-checked" placeholder="Full name"></div>
+          <div class="fld"><label>Confirmed By</label><input type="text" id="rf-confirmed" placeholder="Full name"></div>
+        </div>
+        <div class="fld"><label>Comments</label><textarea id="rf-comments" placeholder="Observations, issues, actions taken…"></textarea></div>
+
+        <button class="btn-primary" onclick="submitRO()">
+          <span id="rf-submit-txt">Save Reading</span>
+          <span id="rf-submit-spin" class="spinner hidden"></span>
+        </button>
+        <button class="btn-secondary" onclick="hideRoForm()">Cancel</button>
+        <div id="rf-msg" class="form-msg hidden"></div>
+      </div>
+
+      <!-- RO Records -->
+      <div class="records-card">
+        <div class="records-hdr">
+          <h3>Recent RO Records</h3>
+          <button class="refresh-btn" onclick="loadRORecords()">↻ Refresh</button>
+        </div>
+        <div id="ro-records-list"><div class="no-records">Loading…</div></div>
+      </div>
+    </div>
+  </div><!-- end ro-section -->
+
+  <!-- ══════════════════════════════════════════
+       ETP SECTION
+  ══════════════════════════════════════════ -->
+  <div id="etp-section" class="hidden">
+    <div class="mod-back-bar">
+      <button class="mod-back-btn" onclick="showModGrid()">← Back</button>
+      <span class="mod-back-title">♻️ ETP Monitoring</span>
+    </div>
+    <div class="app-body">
+      <div id="etp-alert-banner" class="alert-banner hidden"></div>
+
+      <!-- Today Status -->
+      <div class="today-card">
+        <div class="today-hdr">
+          <span>Today's ETP Readings</span>
+          <span id="etp-today-date" style="font-size:11px;color:var(--gray);font-weight:400;text-transform:none;letter-spacing:0;"></span>
+        </div>
+        <div class="today-shifts">
+          <div class="shift-pill pending" id="etp-shift-1000">
+            <div class="shift-time">1000 HRS</div>
+            <div class="shift-status" id="etp-s1000">Not logged</div>
+          </div>
+          <div class="shift-pill pending" id="etp-shift-1600">
+            <div class="shift-time">1600 HRS</div>
+            <div class="shift-status" id="etp-s1600">Not logged</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Log Button -->
+      <div id="etp-log-btn-wrap">
+        <button class="log-btn etp-btn" onclick="showEtpForm()">+ Log ETP Reading</button>
+      </div>
+
+      <!-- ETP Entry Form -->
+      <div id="etp-entry-form" class="form-card hidden">
+        <h3>📋 New ETP Reading</h3>
+
+        <div class="fld-row">
+          <div class="fld"><label>Date</label><input type="date" id="ef-date"></div>
+          <div class="fld"><label>Time Slot</label>
+            <select id="ef-time">
+              <option value="1000HRS">1000 HRS (Morning)</option>
+              <option value="1600HRS">1600 HRS (Afternoon)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-sep">Effluent Tank Levels (Litres)</div>
+        <div class="fld-row">
+          <div class="fld">
+            <label>Equalization Tank</label>
+            <div class="tank-input-wrap">
+              <input type="number" id="ef-eq" placeholder="0" min="0">
+              <span class="tank-capacity">cap: 1000L</span>
+            </div>
+          </div>
+          <div class="fld">
+            <label>Lamella Tank</label>
+            <div class="tank-input-wrap">
+              <input type="number" id="ef-lamella" placeholder="0" min="0">
+              <span class="tank-capacity">cap: 600L</span>
+            </div>
+          </div>
+        </div>
+        <div class="fld-row">
+          <div class="fld">
+            <label>Aeration Tank</label>
+            <div class="tank-input-wrap">
+              <input type="number" id="ef-aeration" placeholder="0" min="0">
+              <span class="tank-capacity">cap: 400L</span>
+            </div>
+          </div>
+          <div class="fld">
+            <label>Post-Treatment Tank</label>
+            <div class="tank-input-wrap">
+              <input type="number" id="ef-posttreat" placeholder="0" min="0">
+              <span class="tank-capacity">cap: 500L</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-sep">Equipment Status</div>
+        <div class="fld">
+          <label>Coagulation Tank Dozing</label>
+          <div class="ok-toggle">
+            <button class="ok-btn sel-ok" onclick="setToggle('ef-coag','Ok',this)">✓ Ok</button>
+            <button class="ok-btn" onclick="setToggle('ef-coag','Not okay',this)">✗ Not okay</button>
+          </div>
+          <input type="hidden" id="ef-coag" value="Ok">
+        </div>
+        <div class="fld" style="margin-top:10px;">
+          <label>Flocculation Tank Dozing</label>
+          <div class="ok-toggle">
+            <button class="ok-btn sel-ok" onclick="setToggle('ef-floc','Ok',this)">✓ Ok</button>
+            <button class="ok-btn" onclick="setToggle('ef-floc','Not okay',this)">✗ Not okay</button>
+          </div>
+          <input type="hidden" id="ef-floc" value="Ok">
+        </div>
+        <div class="fld" style="margin-top:10px;">
+          <label>DMF Pump Situation</label>
+          <div class="ok-toggle">
+            <button class="ok-btn sel-ok" onclick="setToggle('ef-dmf','Ok',this)">✓ Ok</button>
+            <button class="ok-btn" onclick="setToggle('ef-dmf','Not okay',this)">✗ Not okay</button>
+          </div>
+          <input type="hidden" id="ef-dmf" value="Ok">
+        </div>
+        <div class="fld" style="margin-top:10px;">
+          <label>Pipework &amp; Fittings Condition</label>
+          <div class="ok-toggle">
+            <button class="ok-btn sel-ok" onclick="setToggle('ef-pipework','Ok',this)">✓ Ok</button>
+            <button class="ok-btn" onclick="setToggle('ef-pipework','Not okay',this)">✗ Not okay</button>
+          </div>
+          <input type="hidden" id="ef-pipework" value="Ok">
+        </div>
+
+        <div class="section-sep">Discharge Effluent — Compliance</div>
+        <div class="fld">
+          <label style="color:var(--red);font-weight:700;">Discharge Effluent Meeting Parameter?</label>
+          <div class="compliance-toggle">
+            <button class="comp-btn sel-yes" onclick="setCompliance('Yes',this)">✓ Yes</button>
+            <button class="comp-btn" onclick="setCompliance('Partial',this)">~ Partial</button>
+            <button class="comp-btn" onclick="setCompliance('No',this)">✗ No</button>
+          </div>
+          <input type="hidden" id="ef-compliance" value="Yes">
+        </div>
+
+        <div class="section-sep">Effluent Quality Parameters</div>
+        <div class="fld-row">
+          <div class="fld">
+            <label>pH</label>
+            <input type="number" id="ef-ph" placeholder="6.5" step="0.1" min="0" max="14" oninput="hintParam('ef-ph',6.5,6,9,'ef-ph-hint')">
+            <div class="param-hint" id="ef-ph-hint">Reference: 6.5 · Range: 6–9</div>
+          </div>
+          <div class="fld">
+            <label>TDS (mg/L)</label>
+            <input type="number" id="ef-tds" placeholder="6.5" step="0.1" min="0" oninput="hintParam('ef-tds',6.5,0,500,'ef-tds-hint')">
+            <div class="param-hint" id="ef-tds-hint">Reference: 6.5</div>
+          </div>
+        </div>
+        <div class="fld-row-3">
+          <div class="fld"><label>TSS (mg/L)</label><input type="number" id="ef-tss" placeholder="0" min="0"></div>
+          <div class="fld"><label>BOD (mg/L)</label><input type="number" id="ef-bod" placeholder="0" min="0"></div>
+          <div class="fld"><label>COD (mg/L)</label><input type="number" id="ef-cod" placeholder="0" min="0"></div>
+        </div>
+        <div class="fld-row">
+          <div class="fld"><label>Nitrate (mg/L)</label><input type="number" id="ef-nitrate" placeholder="0" min="0"></div>
+          <div class="fld"><label>Color</label><input type="text" id="ef-color" placeholder="Clear / Pale yellow…"></div>
+        </div>
+
+        <div class="section-sep">Sign Off</div>
+        <div class="fld-row">
+          <div class="fld"><label>Checked By</label><input type="text" id="ef-checked" placeholder="Full name"></div>
+          <div class="fld"><label>Confirmed By</label><input type="text" id="ef-confirmed" placeholder="Full name"></div>
+        </div>
+        <div class="fld"><label>Comments</label><textarea id="ef-comments" placeholder="Chemical dosing, sludge removal, equipment issues…"></textarea></div>
+
+        <button class="btn-primary" style="background:var(--purple)" onclick="submitETP()">
+          <span id="ef-submit-txt">Save Reading</span>
+          <span id="ef-submit-spin" class="spinner hidden"></span>
+        </button>
+        <button class="btn-secondary" onclick="hideEtpForm()">Cancel</button>
+        <div id="ef-msg" class="form-msg hidden"></div>
+      </div>
+
+      <!-- ETP Records -->
+      <div class="records-card">
+        <div class="records-hdr">
+          <h3>Recent ETP Records</h3>
+          <button class="refresh-btn etp-refresh" onclick="loadETPRecords()">↻ Refresh</button>
+        </div>
+        <div id="etp-records-list"><div class="no-records">Loading…</div></div>
+      </div>
+    </div>
+  </div><!-- end etp-section -->
+
+  <!-- ══════════════════════════════════════════
+       BULK CO2 SECTION
+  ══════════════════════════════════════════ -->
+  <div id="co2-section" class="hidden">
+    <div class="mod-back-bar">
+      <button class="mod-back-btn" onclick="showModGrid()">← Back</button>
+      <span class="mod-back-title">🧪 Bulk CO₂</span>
+    </div>
+    <div class="app-body">
+      <div id="co2-alert-banner" class="alert-banner hidden"></div>
+
+      <!-- Volume Display -->
+      <div class="vol-display" id="co2-vol-card">
+        <div class="vol-hdr">Current Bulk CO₂ Level</div>
+        <div class="vol-main">
+          <div><span class="vol-kg" id="co2-vol-kg">—</span><span class="vol-unit">kg</span></div>
+          <div style="text-align:right;font-size:11px;color:var(--gray)" id="co2-vol-meta-right"></div>
+        </div>
+        <div class="vol-bar-bg"><div class="vol-bar-fill" id="co2-vol-bar" style="width:0%;background:var(--teal)"></div></div>
+        <div class="vol-meta"><span id="co2-vol-pct">—</span><span id="co2-vol-ref">Ref capacity set per reading</span></div>
+      </div>
+
+      <!-- Today Status -->
+      <div class="today-card">
+        <div class="today-hdr">
+          <span>Today's CO₂ Readings</span>
+          <span id="co2-today-date" style="font-size:11px;color:var(--gray);font-weight:400;text-transform:none;letter-spacing:0;"></span>
+        </div>
+        <div class="today-shifts">
+          <div class="shift-pill pending" id="co2-shift-0900">
+            <div class="shift-time">0900 HRS</div>
+            <div class="shift-status" id="co2-s0900">Not logged</div>
+          </div>
+          <div class="shift-pill pending" id="co2-shift-1500">
+            <div class="shift-time">1500 HRS</div>
+            <div class="shift-status" id="co2-s1500">Not logged</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Log Button -->
+      <div id="co2-log-btn-wrap">
+        <button class="log-btn co2-btn" onclick="showCo2Form()">+ Log CO₂ Reading</button>
+      </div>
+
+      <!-- CO2 Entry Form -->
+      <div id="co2-entry-form" class="form-card hidden">
+        <h3>📋 Bulk CO₂ Facility Reading</h3>
+
+        <div class="fld-row">
+          <div class="fld"><label>Date</label><input type="date" id="cf-date"></div>
+          <div class="fld"><label>Time Slot</label>
+            <select id="cf-time">
+              <option value="0900HRS">0900 HRS (Morning)</option>
+              <option value="1500HRS">1500 HRS (Afternoon)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-sep">CO₂ Volume</div>
+        <div class="fld">
+          <label>Bulk CO₂ Volume (kg)</label>
+          <input type="number" id="cf-volume" placeholder="0" min="0" step="0.1" oninput="updateVolBar()">
+        </div>
+
+        <div class="section-sep">Pressure Gauges</div>
+        <div class="fld-row-3">
+          <div class="fld">
+            <label>Gauge 1 (bar)</label>
+            <input type="number" id="cf-p1" placeholder="20–23" step="0.5" oninput="colorPressure('cf-p1',20,23,'cf-p1-hint')">
+            <div class="pres-hint" id="cf-p1-hint">Range: 20–23 bar</div>
+          </div>
+          <div class="fld">
+            <label>Gauge 2 (bar)</label>
+            <input type="number" id="cf-p2" placeholder="20–23" step="0.5" oninput="colorPressure('cf-p2',20,23,'cf-p2-hint')">
+            <div class="pres-hint" id="cf-p2-hint">Range: 20–23 bar</div>
+          </div>
+          <div class="fld">
+            <label>Gauge 3 (bar)</label>
+            <input type="number" id="cf-p3" placeholder="5–8" step="0.5" oninput="colorPressure('cf-p3',5,8,'cf-p3-hint')">
+            <div class="pres-hint" id="cf-p3-hint">Range: 5–8 bar</div>
+          </div>
+        </div>
+
+        <div class="section-sep">Equipment Checks</div>
+        <div class="fld">
+          <label>Vaporiser State</label>
+          <div class="ok-toggle">
+            <button class="ok-btn sel-ok" onclick="setToggle('cf-vaporiser','Not all frozen',this)" style="font-size:12px">Not all frozen</button>
+            <button class="ok-btn" onclick="setToggle('cf-vaporiser','All frozen',this)" style="font-size:12px">All frozen</button>
+          </div>
+          <input type="hidden" id="cf-vaporiser" value="Not all frozen">
+        </div>
+        <div class="fld" style="margin-top:10px;">
+          <label>CO₂ Leak Detection</label>
+          <div class="ok-toggle">
+            <button class="ok-btn sel-ok" onclick="setToggle('cf-leak','No leakage',this)">✓ No leakage</button>
+            <button class="ok-btn" onclick="setToggle('cf-leak','Leakage detected',this)">⚠ Leakage detected</button>
+          </div>
+          <input type="hidden" id="cf-leak" value="No leakage">
+        </div>
+        <div class="fld" style="margin-top:10px;">
+          <label>Tank Exterior &amp; Insulation Condition</label>
+          <select id="cf-tank-cond" onchange="colorStatus(this)">
+            <option>In good condition</option>
+            <option>Minor damage</option>
+            <option>Insulation compromised</option>
+            <option>Needs inspection</option>
+            <option>Under repair</option>
+          </select>
+        </div>
+        <div class="fld">
+          <label>Pipework &amp; Fittings Condition</label>
+          <select id="cf-pipe-cond" onchange="colorStatus(this)">
+            <option>In good condition</option>
+            <option>Minor leakage</option>
+            <option>Leakage</option>
+            <option>Needs repair</option>
+            <option>Under repair</option>
+          </select>
+        </div>
+        <div class="fld" style="margin-top:10px;">
+          <label>Foundation / Anchoring</label>
+          <div class="ok-toggle">
+            <button class="ok-btn sel-ok" onclick="setToggle('cf-foundation','Anchoring secure',this)" style="font-size:12px">Anchoring secure</button>
+            <button class="ok-btn" onclick="setToggle('cf-foundation','Sinking',this)" style="font-size:12px;color:var(--red)">⚠ Sinking</button>
+          </div>
+          <input type="hidden" id="cf-foundation" value="Anchoring secure">
+        </div>
+
+        <div class="section-sep">Sign Off</div>
+        <div class="fld-row">
+          <div class="fld"><label>Checked By</label><input type="text" id="cf-checked" placeholder="Full name"></div>
+          <div class="fld"><label>Confirmed By</label><input type="text" id="cf-confirmed" placeholder="Full name"></div>
+        </div>
+        <div class="fld"><label>Comments</label><textarea id="cf-comments" placeholder="Delivery received, pressure issues, observations…"></textarea></div>
+
+        <button class="btn-primary" style="background:var(--amber)" onclick="submitCO2()">
+          <span id="cf-submit-txt">Save Reading</span>
+          <span id="cf-submit-spin" class="spinner hidden"></span>
+        </button>
+        <button class="btn-secondary" onclick="hideCo2Form()">Cancel</button>
+        <div id="cf-msg" class="form-msg hidden"></div>
+      </div>
+
+      <!-- CO2 Records -->
+      <div class="records-card">
+        <div class="records-hdr">
+          <h3>Recent CO₂ Records</h3>
+          <button class="refresh-btn co2-refresh" onclick="loadCO2Records()">↻ Refresh</button>
+        </div>
+        <div id="co2-records-list"><div class="no-records">Loading…</div></div>
+      </div>
+    </div>
+  </div><!-- end co2-section -->
+
+  <!-- ══════════════════════════════════════════
+       ELECTRICITY SECTION
+  ══════════════════════════════════════════ -->
+  <div id="elec-section" class="hidden">
+    <div class="mod-back-bar">
+      <button class="mod-back-btn" onclick="showModGrid()">← Back</button>
+      <span class="mod-back-title">⚡ Electricity</span>
+    </div>
+    <div class="app-body">
+      <div id="elec-alert-banner" class="alert-banner hidden"></div>
+
+      <!-- Today Status -->
+      <div class="today-card">
+        <div class="today-hdr">
+          <span>Today's Meter Readings</span>
+          <span id="elec-today-date" style="font-size:11px;color:var(--gray);font-weight:400;text-transform:none;letter-spacing:0;"></span>
+        </div>
+        <div id="elec-today-status" class="today-status" style="color:var(--gray)">No readings logged yet today</div>
+      </div>
+
+      <!-- Log Button -->
+      <div id="elec-log-btn-wrap">
+        <button class="log-btn elec-btn" onclick="showElecForm()">⚡ Log Meter Readings</button>
+      </div>
+
+      <!-- Entry Form -->
+      <div id="elec-entry-form" class="form-card hidden">
+        <h3>⚡ Meter Readings</h3>
+        <div class="fld-row">
+          <div class="fld"><label>Date</label><input type="date" id="elc-date"></div>
+          <div class="fld"><label>Read By</label><input type="text" id="elc-by" placeholder="Full name"></div>
+        </div>
+
+        <div class="section-sep">Shared Meter — WH 34 · WH 35 · WH 25</div>
+        <div class="fld">
+          <div class="meter-prev" id="elc-m1-prev">Previous: —</div>
+          <label>Current Reading (kWh)</label>
+          <input type="number" id="elc-m1" placeholder="e.g. 45230" min="0" step="1">
+        </div>
+
+        <div class="section-sep">Warehouse 26 Meter</div>
+        <div class="fld">
+          <div class="meter-prev" id="elc-m2-prev">Previous: —</div>
+          <label>Current Reading (kWh)</label>
+          <input type="number" id="elc-m2" placeholder="e.g. 8500" min="0" step="1">
+        </div>
+
+        <div class="section-sep">Warehouse 36 Meter</div>
+        <div class="fld">
+          <div class="meter-prev" id="elc-m3-prev">Previous: —</div>
+          <label>Current Reading (kWh)</label>
+          <input type="number" id="elc-m3" placeholder="e.g. 6100" min="0" step="1">
+        </div>
+
+        <div class="section-sep">Warehouse 58 Meter</div>
+        <div class="fld">
+          <div class="meter-prev" id="elc-m4-prev">Previous: —</div>
+          <label>Current Reading (kWh)</label>
+          <input type="number" id="elc-m4" placeholder="e.g. 3200" min="0" step="1">
+        </div>
+
+        <div class="section-sep">Sign Off</div>
+        <div class="fld"><label>Comments / Notes</label><textarea id="elc-comments" placeholder="Faulty meter, unusual spike, delivery notes…"></textarea></div>
+
+        <button class="btn-primary" style="background:var(--elec)" onclick="submitElec()">
+          <span id="elc-submit-txt">Save Readings</span>
+          <span id="elc-submit-spin" class="spinner hidden"></span>
+        </button>
+        <button class="btn-secondary" onclick="hideElecForm()">Cancel</button>
+        <div id="elc-msg" class="form-msg hidden"></div>
+      </div>
+
+      <!-- Records -->
+      <div class="records-card">
+        <div class="records-hdr">
+          <h3>Recent Readings</h3>
+          <button class="refresh-btn elec-refresh" onclick="loadElecRecords()">↻ Refresh</button>
+        </div>
+        <div id="elec-records-list"><div class="no-records">Loading…</div></div>
+      </div>
+    </div>
+  </div><!-- end elec-section -->
+
+  <!-- ══════════════════════════════════════════
+       MAINTENANCE SECTION
+  ══════════════════════════════════════════ -->
+  <div id="maint-section" class="hidden">
+
+    <!-- Maintenance Sub-tabs -->
+    <div class="maint-subtabs">
+      <button class="mod-back-btn" onclick="showModGrid()" style="flex-shrink:0;border:none;border-right:1px solid var(--border);border-radius:0;padding:10px 12px;font-size:13px;">←</button>
+      <button class="maint-tab active" id="maint-nav-dash" onclick="switchMaintView('dash')">📊 Dashboard</button>
+      <button class="maint-tab" id="maint-nav-log" onclick="switchMaintView('log')">
+        ✅ Log Tasks <span class="maint-badge hidden" id="maint-log-badge">0</span>
+      </button>
+      <button class="maint-tab" id="maint-nav-hist" onclick="switchMaintView('hist')">📋 History</button>
+    </div>
+
+    <!-- ══ DASHBOARD VIEW ══ -->
+    <div id="maint-dash" class="app-body">
+      <div class="welcome-card">
+        <h2 id="dash-greeting">Good morning</h2>
+        <p id="dash-date"></p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">Overdue</div><div class="stat-val red" id="st-overdue">—</div><div class="stat-sub">tasks past due</div></div>
+        <div class="stat-card"><div class="stat-label">Due Soon</div><div class="stat-val amber" id="st-due">—</div><div class="stat-sub">need attention</div></div>
+        <div class="stat-card"><div class="stat-label">Done Today</div><div class="stat-val green" id="st-done">—</div><div class="stat-sub">completed</div></div>
+        <div class="stat-card"><div class="stat-label">Up to Date</div><div class="stat-val" id="st-ok">—</div><div class="stat-sub">on schedule</div></div>
+      </div>
+      <p class="sec-hdr">Overdue &amp; Due Tasks</p>
+      <div id="dash-due-list"><div class="no-records" style="background:white;border-radius:10px;border:1px solid var(--border)">Loading schedule…</div></div>
+    </div>
+
+    <!-- ══ LOG VIEW ══ -->
+    <div id="maint-log" class="app-body hidden">
+      <p class="sec-hdr" style="margin-top:0">Select tasks performed</p>
+      <div id="equip-list"></div>
+      <div id="log-extra" class="log-extra hidden" style="border-radius:12px;border:1px solid var(--border);margin-bottom:72px;">
+        <div class="fld" style="margin-bottom:10px;">
+          <label>Date Performed</label>
+          <input type="date" id="log-date">
+        </div>
+        <div class="fld" style="margin-bottom:10px;">
+          <label>Performed By</label>
+          <input type="text" id="log-by" placeholder="Full name">
+        </div>
+        <div class="fld" style="margin-bottom:0;">
+          <label>Notes / Observations</label>
+          <textarea id="log-notes" placeholder="Parts replaced, issues found, actions taken…"></textarea>
+        </div>
+        <div id="log-msg" class="form-msg hidden"></div>
+      </div>
+      <div id="log-submit-bar" class="log-submit-bar hidden">
+        <button class="log-submit-btn" id="log-submit-btn" onclick="submitLog()">
+          <span id="log-submit-txt">Submit 0 Tasks</span>
+          <span id="log-submit-spin" class="spinner hidden"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ HISTORY VIEW ══ -->
+    <div id="maint-hist" class="app-body hidden">
+      <div class="hist-filter" id="hist-filter">
+        <button class="hist-chip active" onclick="filterHist('all',this)">All Equipment</button>
+      </div>
+      <div id="hist-list"><div class="no-records">Loading history…</div></div>
+    </div>
+
+  </div><!-- end maint-section -->
+
+  <!-- ══════════════════════════════════════════
+       WATER METERS SECTION
+  ══════════════════════════════════════════ -->
+  <div id="water-section" class="hidden">
+    <div class="mod-back-bar">
+      <button class="mod-back-btn" onclick="showModGrid()">← Back</button>
+      <span class="mod-back-title">💧 Water Meters</span>
+    </div>
+    <div class="app-body">
+
+      <!-- Today Status -->
+      <div class="today-card">
+        <div class="today-hdr">
+          <span>Today's Water Readings</span>
+          <span id="water-today-date" style="font-size:11px;color:var(--gray);font-weight:400;text-transform:none;letter-spacing:0;"></span>
+        </div>
+        <div id="water-today-status" class="today-status" style="color:var(--gray)">No readings logged yet today</div>
+      </div>
+
+      <!-- Log Button -->
+      <div id="water-log-btn-wrap">
+        <button class="log-btn water-btn" onclick="showWaterForm()">💧 Log Water Readings</button>
+      </div>
+
+      <!-- Entry Form -->
+      <div id="water-entry-form" class="form-card hidden">
+        <h3>💧 Water Meter Readings</h3>
+        <div class="fld-row">
+          <div class="fld"><label>Date</label><input type="date" id="wlc-date"></div>
+          <div class="fld"><label>Read By</label><input type="text" id="wlc-by" placeholder="Full name"></div>
+        </div>
+
+        <div class="section-sep">WH Inlet Meters</div>
+        <div class="fld">
+          <div class="meter-prev" id="wlc-wm1-prev">Previous: —</div>
+          <label>WH 34 Meter (L)</label>
+          <input type="number" id="wlc-wm1" placeholder="e.g. 285400" min="0" step="1">
+        </div>
+        <div class="fld">
+          <div class="meter-prev" id="wlc-wm2-prev">Previous: —</div>
+          <label>WH 36 Meter (L)</label>
+          <input type="number" id="wlc-wm2" placeholder="e.g. 196200" min="0" step="1">
+        </div>
+
+        <div class="section-sep">Post-Raw Water Tank Meters</div>
+        <div class="fld">
+          <div class="meter-prev" id="wlc-wm3-prev">Previous: —</div>
+          <label>Post-Raw Meter 1 (L)</label>
+          <input type="number" id="wlc-wm3" placeholder="e.g. 142600" min="0" step="1">
+        </div>
+        <div class="fld">
+          <div class="meter-prev" id="wlc-wm4-prev">Previous: —</div>
+          <label>Post-Raw Meter 2 (L)</label>
+          <input type="number" id="wlc-wm4" placeholder="e.g. 98300" min="0" step="1">
+        </div>
+
+        <div class="section-sep">Tank Levels</div>
+        <div class="fld-row">
+          <div class="fld"><label>Raw Water Tank (L)</label><input type="number" id="wlc-raw" placeholder="0" min="0" step="1"></div>
+          <div class="fld"><label>RO Tank (L)</label><input type="number" id="wlc-ro" placeholder="0" min="0" step="1"></div>
+        </div>
+
+        <div class="section-sep">Sign Off</div>
+        <div class="fld"><label>Comments / Notes</label><textarea id="wlc-comments" placeholder="Leaks, unusual readings, maintenance notes…"></textarea></div>
+
+        <button class="btn-primary" style="background:var(--water)" onclick="submitWater()">
+          <span id="wlc-submit-txt">Save Readings</span>
+          <span id="wlc-submit-spin" class="spinner hidden"></span>
+        </button>
+        <button class="btn-secondary" onclick="hideWaterForm()">Cancel</button>
+        <div id="wlc-msg" class="form-msg hidden"></div>
+      </div>
+
+      <!-- Records -->
+      <div class="records-card">
+        <div class="records-hdr">
+          <h3>Recent Readings</h3>
+          <button class="refresh-btn water-refresh" onclick="loadWaterRecords()">↻ Refresh</button>
+        </div>
+        <div id="water-records-list"><div class="no-records">Loading…</div></div>
+      </div>
+
+    </div>
+  </div><!-- end water-section -->
+
+</div><!-- end pg-app -->
+
+<script>
+// ═══════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════
+const API_URL    = 'YOUR_APPS_SCRIPT_DEPLOYMENT_URL';
+const CLIENT_KEY = 'KO@RO#2026$MON!rV3wP';
+
+// ── MAINTENANCE SCHEDULE (all factory equipment) ──────────
+const SCHEDULE = [
+  { id:'CHR', name:'Chiller and Cold Room', icon:'❄️', tasks:[
+    { id:'CHR-01', task:'Checking set vs achieved temperatures', freq:'daily' },
+    { id:'CHR-02', task:'Checking Piping network for leaks & damages', freq:'daily' },
+    { id:'CHR-03', task:'Checking the pressure gauges', freq:'weekly' },
+    { id:'CHR-04', task:'Checking the pump system', freq:'weekly' },
+    { id:'CHR-05', task:'Checking the control panel', freq:'weekly' },
+    { id:'CHR-06', task:'Checking copper pipe work', freq:'weekly' },
+    { id:'CHR-07', task:'Checking, Topping and Balancing the refrigerant gas', freq:'monthly' },
+    { id:'CHR-08', task:'Analyzing the Compressor oil', freq:'monthly' },
+    { id:'CHR-09', task:'Maintaining adequate glycol in the Chiller system', freq:'monthly' },
+    { id:'CHR-10', task:'Cleaning the Condenser grills', freq:'monthly' },
+    { id:'CHR-11', task:'Checking the working of the flow switch', freq:'monthly' },
+    { id:'CHR-12', task:'Checking the thermal expansion valve', freq:'quarterly' },
+    { id:'CHR-13', task:'Cleaning the Evaporator coil', freq:'6months' },
+  ]},
+  { id:'PBL', name:'Pasteurizer and Boiler', icon:'🔥', tasks:[
+    { id:'PBL-01', task:'Checking set vs achieved temperatures', freq:'daily' },
+    { id:'PBL-02', task:'Ensuring constant clean water supply', freq:'daily' },
+    { id:'PBL-03', task:'Checking the electrical controls', freq:'weekly' },
+    { id:'PBL-04', task:'Checking and Cleaning heating elements', freq:'weekly' },
+    { id:'PBL-05', task:'Checking the Thermometer sensor', freq:'weekly' },
+    { id:'PBL-06', task:'Checking the Control valves', freq:'weekly' },
+    { id:'PBL-07', task:'Checking on the door gaskets', freq:'monthly' },
+    { id:'PBL-08', task:'Checking on the body structure', freq:'monthly' },
+  ]},
+  { id:'JHM', name:'Juicer Machine & Hydraulic Pressing', icon:'🍋', tasks:[
+    { id:'JHM-01', task:'Cleaning & Checking the motor', freq:'daily' },
+    { id:'JHM-02', task:'Checking the electrical and control system', freq:'weekly' },
+    { id:'JHM-03', task:'Checking oil level', freq:'weekly' },
+    { id:'JHM-04', task:'Cleaning the machine', freq:'weekly' },
+    { id:'JHM-05', task:'Checking oil quality', freq:'monthly' },
+    { id:'JHM-06', task:'Checking the bolts and nuts', freq:'monthly' },
+  ]},
+  { id:'BFC', name:'Bottle Filler Machine & Can-Seamer', icon:'🍶', tasks:[
+    { id:'BFC-01', task:'Checking sealing machine tray', freq:'daily' },
+    { id:'BFC-02', task:'Checking the pressure head', freq:'daily' },
+    { id:'BFC-03', task:'Checking the motors', freq:'daily' },
+    { id:'BFC-04', task:'Lubricating interior moving parts', freq:'weekly' },
+    { id:'BFC-05', task:'Cleaning by suctioning with appropriate solvent', freq:'weekly' },
+    { id:'BFC-06', task:'Checking the solenoid valves', freq:'weekly' },
+    { id:'BFC-07', task:'Checking the capping system', freq:'weekly' },
+    { id:'BFC-08', task:'Checking the V-belt', freq:'weekly' },
+    { id:'BFC-09', task:'Lubricating the gears', freq:'weekly' },
+    { id:'BFC-10', task:'Checking the sealing wheel', freq:'monthly' },
+    { id:'BFC-11', task:'Checking and replacing worn out seals and gaskets', freq:'monthly' },
+    { id:'BFC-12', task:'Checking Electrical and Earthing systems', freq:'monthly' },
+    { id:'BFC-13', task:'Checking the pipe work', freq:'quarterly' },
+    { id:'BFC-14', task:'Checking the pneumatic systems', freq:'quarterly' },
+    { id:'BFC-15', task:'Checking the HMI monitor', freq:'quarterly' },
+  ]},
+  { id:'PWP', name:'Production Pump & Water Pumps', icon:'💦', tasks:[
+    { id:'PWP-01', task:'Verifying operation range', freq:'daily' },
+    { id:'PWP-02', task:'Checking the drainage systems', freq:'daily' },
+    { id:'PWP-03', task:'Checking all nuts, bolts and screws', freq:'weekly' },
+    { id:'PWP-04', task:'Checking pump motor and auto control panels', freq:'weekly' },
+    { id:'PWP-05', task:'Inspecting interior coatings', freq:'monthly' },
+    { id:'PWP-06', task:'Inspecting alignment of discharge and suction pipes', freq:'monthly' },
+    { id:'PWP-07', task:'Checking the Electrical control system', freq:'monthly' },
+    { id:'PWP-08', task:'Checking the motor', freq:'monthly' },
+    { id:'PWP-09', task:'Inspecting exterior coatings', freq:'quarterly' },
+    { id:'PWP-10', task:'Checking the seals and gaskets', freq:'quarterly' },
+    { id:'PWP-11', task:'Checking the impeller and fan', freq:'quarterly' },
+  ]},
+  { id:'IAC', name:'Ingersoll Rand Air Compressor', icon:'💨', tasks:[
+    { id:'IAC-01', task:'Check for no alarm signals', freq:'daily' },
+    { id:'IAC-02', task:'Check manual condensate discharge', freq:'daily' },
+    { id:'IAC-03', task:'Check compressed air inlet temp. (30–40°C)', freq:'daily' },
+    { id:'IAC-04', task:'Check upper part temp. (≤50°C)', freq:'daily' },
+    { id:'IAC-05', task:'Drain the receiver', freq:'daily' },
+    { id:'IAC-06', task:'Cleaning the compressor component', freq:'weekly' },
+    { id:'IAC-07', task:'Bleeding the compressor tank', freq:'weekly' },
+    { id:'IAC-08', task:'Cleaning intake valves', freq:'weekly' },
+    { id:'IAC-09', task:'Checking the Air filter', freq:'weekly' },
+    { id:'IAC-10', task:'Clean cooling air inlet filter', freq:'weekly' },
+    { id:'IAC-11', task:'Clean the line filters', freq:'weekly' },
+    { id:'IAC-12', task:'Inspecting the PU pipe and connection fittings', freq:'monthly' },
+    { id:'IAC-13', task:'Tightening nuts and bolts and fittings', freq:'monthly' },
+    { id:'IAC-14', task:'Service condensate discharge system', freq:'monthly' },
+    { id:'IAC-15', task:'Checking and changing the oil', freq:'quarterly' },
+    { id:'IAC-16', task:'Check piping connections', freq:'quarterly' },
+    { id:'IAC-17', task:'Clean condenser fins with compressed air jet', freq:'quarterly' },
+    { id:'IAC-18', task:'Checking and changing air/oil separator', freq:'6months' },
+    { id:'IAC-19', task:'Check grills for dirt & obstruction', freq:'6months' },
+    { id:'IAC-20', task:'Clean the compressor (internal)', freq:'yearly' },
+    { id:'IAC-21', task:'Inspect refrigerant piping (visual)', freq:'yearly' },
+  ]},
+  { id:'IAD', name:'Ingersoll Rand Air Drier', icon:'🌬️', tasks:[
+    { id:'IAD-01', task:'Observe the running temperature', freq:'daily' },
+    { id:'IAD-02', task:'Checking the compressor', freq:'monthly' },
+    { id:'IAD-03', task:'Checking the refrigerant gas', freq:'monthly' },
+    { id:'IAD-04', task:'Checking the PU pipes and connectors', freq:'monthly' },
+    { id:'IAD-05', task:'Cleaning the condenser grill', freq:'monthly' },
+    { id:'IAD-06', task:'Check the drainage system', freq:'monthly' },
+    { id:'IAD-07', task:'Oil separator element', freq:'quarterly' },
+    { id:'IAD-08', task:'Change oil', freq:'quarterly' },
+    { id:'IAD-09', task:'Replace air filter cartridge', freq:'quarterly' },
+  ]},
+  { id:'ELS', name:'Electrical System', icon:'⚡', tasks:[
+    { id:'ELS-01', task:'Lights', freq:'weekly' },
+    { id:'ELS-02', task:'Sockets', freq:'weekly' },
+    { id:'ELS-03', task:'Insectocutors', freq:'weekly' },
+    { id:'ELS-04', task:'Cables along the cable tray', freq:'monthly' },
+    { id:'ELS-05', task:'Mains, DB, CU and Earthing systems', freq:'quarterly' },
+    { id:'ELS-06', task:'LV Board', freq:'quarterly' },
+  ]},
+  { id:'ROP', name:'Water Treatment Plant — RO', icon:'🌊', tasks:[
+    { id:'ROP-01', task:'Checking the carbon and sand filter', freq:'daily' },
+    { id:'ROP-02', task:'Verifying operation range', freq:'daily' },
+    { id:'ROP-03', task:'Inspecting the pumps', freq:'weekly' },
+    { id:'ROP-04', task:'Checking the electrical control system', freq:'weekly' },
+    { id:'ROP-05', task:'Checking the auto shut valves', freq:'weekly' },
+    { id:'ROP-06', task:'Inspecting alignment of discharge and suction pipes', freq:'weekly' },
+    { id:'ROP-07', task:'Checking the pressure vessels and membrane filters', freq:'monthly' },
+    { id:'ROP-08', task:'Checking the cartridge filters', freq:'monthly' },
+    { id:'ROP-09', task:'Checking pump motors', freq:'monthly' },
+    { id:'ROP-10', task:'Checking on the check valves', freq:'monthly' },
+    { id:'ROP-11', task:'Checking the seals and gaskets', freq:'quarterly' },
+    { id:'ROP-12', task:'Replacement of UV lights', freq:'quarterly' },
+    { id:'ROP-13', task:'Checking the impeller and fan', freq:'quarterly' },
+  ]},
+  { id:'CH2', name:'Chiller 2 & PHEs', icon:'🧊', tasks:[
+    { id:'CH2-01', task:'Verifying operation range', freq:'daily' },
+    { id:'CH2-02', task:'Inspecting the pipe works', freq:'weekly' },
+    { id:'CH2-03', task:'Checking the electrical control system', freq:'weekly' },
+    { id:'CH2-04', task:'Checking the auto shut valves', freq:'weekly' },
+    { id:'CH2-05', task:'Inspecting alignment of discharge and suction pipes', freq:'weekly' },
+    { id:'CH2-06', task:'Checking pump motors', freq:'weekly' },
+    { id:'CH2-07', task:'Checking on the check valves', freq:'monthly' },
+    { id:'CH2-08', task:'Checking the seals and gaskets', freq:'monthly' },
+    { id:'CH2-09', task:'Checking the impeller and fan', freq:'quarterly' },
+  ]},
+  { id:'FTB', name:'Brite / Fermentation / Blending Tanks', icon:'🍺', tasks:[
+    { id:'FTB-01', task:'Checking the Electrical thermo control', freq:'daily' },
+    { id:'FTB-02', task:'Checking the Thermometer sensor', freq:'daily' },
+    { id:'FTB-03', task:'Checking and Cleaning interior components', freq:'weekly' },
+    { id:'FTB-04', task:'Checking the Control valves', freq:'weekly' },
+    { id:'FTB-05', task:'Checking on the gaskets and seals', freq:'weekly' },
+    { id:'FTB-06', task:'Checking on the pipe works', freq:'weekly' },
+    { id:'FTB-07', task:'Checking on the body component', freq:'monthly' },
+    { id:'FTB-08', task:'Checking on the glycol coolant circulation', freq:'monthly' },
+  ]},
+  { id:'SPL', name:'Spirits Line', icon:'🥃', tasks:[
+    { id:'SPL-01', task:'Pneumatic Pumps', freq:'weekly' },
+    { id:'SPL-02', task:'Centrifugal Pumps', freq:'weekly' },
+    { id:'SPL-03', task:'Piping & Fittings', freq:'weekly' },
+    { id:'SPL-04', task:'Flowmeters', freq:'weekly' },
+    { id:'SPL-05', task:'Electrical System', freq:'weekly' },
+    { id:'SPL-06', task:'Deionizer', freq:'monthly' },
+    { id:'SPL-07', task:'Distillation Unit', freq:'quarterly' },
+    { id:'SPL-08', task:'Filtration Unit', freq:'quarterly' },
+    { id:'SPL-09', task:'Spirit Tanks', freq:'yearly' },
+  ]},
+  { id:'GEN', name:'Generator', icon:'🔋', tasks:[
+    { id:'GEN-01', task:'Checking the oil', freq:'daily' },
+    { id:'GEN-02', task:'Observe the running hours', freq:'daily' },
+    { id:'GEN-03', task:'Checking the surface and fittings', freq:'weekly' },
+    { id:'GEN-04', task:'Cleaning the fuel level', freq:'weekly' },
+    { id:'GEN-05', task:'Checking the compressor', freq:'weekly' },
+    { id:'GEN-06', task:'Oil separator element', freq:'monthly' },
+    { id:'GEN-07', task:'Change oil', freq:'quarterly' },
+    { id:'GEN-08', task:'Replace air filter cartridge', freq:'quarterly' },
+  ]},
+  { id:'RBL', name:'Raveco Bottling Line', icon:'🍾', tasks:[
+    { id:'RBL-01', task:'Checking Electrical and Earthing systems', freq:'daily' },
+    { id:'RBL-02', task:'Checking sealing machine tray', freq:'daily' },
+    { id:'RBL-03', task:'Checking vent tubes', freq:'daily' },
+    { id:'RBL-04', task:'Checking the CIP station', freq:'daily' },
+    { id:'RBL-05', task:'Checking the conveyor belt', freq:'daily' },
+    { id:'RBL-06', task:'Checking and setting starwheels, screw worms & accessories', freq:'weekly' },
+    { id:'RBL-07', task:'Checking and setting the labeling station', freq:'weekly' },
+    { id:'RBL-08', task:'Checking centribells', freq:'weekly' },
+    { id:'RBL-09', task:'Checking feeling bowl, lifting cylinders & safety devices', freq:'weekly' },
+    { id:'RBL-10', task:'Checking the motors', freq:'weekly' },
+    { id:'RBL-11', task:'Lubricating the gears', freq:'weekly' },
+    { id:'RBL-12', task:'Checking the solenoid valves & safety valves', freq:'weekly' },
+    { id:'RBL-13', task:'Checking the capping system', freq:'weekly' },
+    { id:'RBL-14', task:'Checking the V-belt', freq:'weekly' },
+    { id:'RBL-15', task:'Lubricating interior moving parts', freq:'monthly' },
+    { id:'RBL-16', task:'Checking the pipe work', freq:'monthly' },
+    { id:'RBL-17', task:'Checking the pneumatic systems', freq:'monthly' },
+    { id:'RBL-18', task:'Checking and replacing worn out seals and gaskets', freq:'quarterly' },
+    { id:'RBL-19', task:'Checking the HMI monitor', freq:'quarterly' },
+  ]},
+  { id:'CCL', name:'Cask Canning Line', icon:'🥫', tasks:[
+    { id:'CCL-01', task:'Checking sealing machine tray', freq:'daily' },
+    { id:'CCL-02', task:'Checking vent tubes, purging line and sensors', freq:'daily' },
+    { id:'CCL-03', task:'Checking the CIP station', freq:'daily' },
+    { id:'CCL-04', task:'Checking the conveyor belt', freq:'daily' },
+    { id:'CCL-05', task:'Checking and setting the coding unit', freq:'weekly' },
+    { id:'CCL-06', task:'Checking and setting the dapal', freq:'weekly' },
+    { id:'CCL-07', task:'Checking and setting the packleader labeler', freq:'weekly' },
+    { id:'CCL-08', task:'Checking seaming unit - carousel, lift table, dies', freq:'weekly' },
+    { id:'CCL-09', task:'Checking feeling tube, filling coils & safety devices', freq:'weekly' },
+    { id:'CCL-10', task:'Checking the motors', freq:'weekly' },
+    { id:'CCL-11', task:'Checking safety devices', freq:'weekly' },
+    { id:'CCL-12', task:'Checking the solenoid valves & safety valves', freq:'weekly' },
+    { id:'CCL-13', task:'Checking and inspecting the control panel', freq:'weekly' },
+    { id:'CCL-14', task:'Checking and replacing worn out seals and gaskets', freq:'monthly' },
+    { id:'CCL-15', task:'Checking the pipe work', freq:'monthly' },
+    { id:'CCL-16', task:'Checking the pneumatic systems', freq:'monthly' },
+    { id:'CCL-17', task:'Checking the HMI monitor', freq:'monthly' },
+    { id:'CCL-18', task:'Checking Electrical and Earthing systems', freq:'quarterly' },
+  ]},
+  { id:'CTF', name:'Centrifuge', icon:'🔄', tasks:[
+    { id:'CTF-01', task:'Checking and cleaning the overall body of the machine', freq:'daily' },
+    { id:'CTF-02', task:'Observe the running parameter', freq:'daily' },
+    { id:'CTF-03', task:'Oil level', freq:'weekly' },
+    { id:'CTF-04', task:'Checking the utility pipings', freq:'weekly' },
+    { id:'CTF-05', task:'Checking the water pressure booster', freq:'weekly' },
+    { id:'CTF-06', task:'Checking the water pump', freq:'weekly' },
+    { id:'CTF-07', task:'Checking the PU pipes and connectors', freq:'weekly' },
+    { id:'CTF-08', task:'Cleaning the control panel', freq:'weekly' },
+    { id:'CTF-09', task:'Check the gasket and seals', freq:'weekly' },
+    { id:'CTF-10', task:'Check the sensors and signal controls', freq:'weekly' },
+    { id:'CTF-11', task:'Check the safety components', freq:'weekly' },
+    { id:'CTF-12', task:'Check and cleaning the strainers', freq:'weekly' },
+    { id:'CTF-13', task:'Check the drainage system', freq:'weekly' },
+    { id:'CTF-14', task:'Change oil', freq:'monthly' },
+    { id:'CTF-15', task:'Replace the separator bowls', freq:'quarterly' },
+  ]},
+  { id:'ILC', name:'Inline Carbonator', icon:'🫧', tasks:[
+    { id:'ILC-01', task:'Observe the running parameter', freq:'daily' },
+    { id:'ILC-02', task:'Check and clean the machine', freq:'weekly' },
+    { id:'ILC-03', task:'Inspect the control panel', freq:'weekly' },
+    { id:'ILC-04', task:'Checking the safety controls', freq:'weekly' },
+    { id:'ILC-05', task:'Check the gasket and seals', freq:'weekly' },
+    { id:'ILC-06', task:'Checking the PU pipes and connectors', freq:'weekly' },
+    { id:'ILC-07', task:'Cleaning the filter strainer', freq:'weekly' },
+    { id:'ILC-08', task:'Check the drainage system', freq:'weekly' },
+    { id:'ILC-09', task:'Replace air filter cartridge', freq:'monthly' },
+  ]},
+  { id:'BCO', name:'Bulk CO2 Facility', icon:'🧪', tasks:[
+    { id:'BCO-01', task:'Check the CO2 levels', freq:'daily' },
+    { id:'BCO-02', task:'Observe the running parameter', freq:'daily' },
+    { id:'BCO-03', task:'Inspect the control panel', freq:'weekly' },
+    { id:'BCO-04', task:'Inspecting the pipework', freq:'weekly' },
+    { id:'BCO-05', task:'Checking the safety controls', freq:'weekly' },
+    { id:'BCO-06', task:'Checking the PU pipes and connectors', freq:'weekly' },
+    { id:'BCO-07', task:'Checking the pressure gauges', freq:'weekly' },
+  ]},
+];
+const FREQ_DAYS  = { daily:1, weekly:7, monthly:30, quarterly:90, '6months':180, yearly:365 };
+const FREQ_LABEL = { daily:'Daily', weekly:'Weekly', monthly:'Monthly', quarterly:'Quarterly', '6months':'6 Months', yearly:'Yearly' };
+
+// ── WATER METERS ─────────────────────────────
+const WATER_METERS = [
+  { id:'wm1', label:'WH 34 Meter',      sub:'Warehouse 34 inlet' },
+  { id:'wm2', label:'WH 36 Meter',      sub:'Warehouse 36 inlet' },
+  { id:'wm3', label:'Post-Raw Meter 1', sub:'After raw water tank' },
+  { id:'wm4', label:'Post-Raw Meter 2', sub:'After raw water tank' },
+];
+
+// ── ELECTRICITY METERS ────────────────────────
+const METERS = [
+  { id:'m1', label:'Shared Meter', sub:'WH 34 · WH 35 · WH 25' },
+  { id:'m2', label:'Warehouse 26', sub:'Individual meter' },
+  { id:'m3', label:'Warehouse 36', sub:'Individual meter' },
+  { id:'m4', label:'Warehouse 58', sub:'Individual meter' },
+];
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let currentUser   = null;
+let pinBuffer     = '';
+let currentModule = 'ro';
+let currentPlant  = '2000';
+let roToday       = {};   // { '2000': { '0800HRS':bool, '1730HRS':bool }, '4000': {...} }
+let etpToday      = {};   // { '1000HRS':bool, '1600HRS':bool }
+let co2Today      = {};   // { '0900HRS':bool, '1500HRS':bool }
+let co2LatestVol  = null;
+let co2RefCap     = null;
+let isDemoMode    = false;
+let elecToday     = false;
+let elecPrev      = {};
+let waterToday    = false;
+let waterPrev     = {};
+let lastDoneMap   = {};
+let checkedTasks  = {};
+let maintView     = 'dash';
+let histFilter    = 'all';
+let histAllLogs   = [];
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = sessionStorage.getItem('wt_user');
+  if (saved) { currentUser = JSON.parse(saved); bootApp(); }
+  else showPage('pg-login');
+  const today = todayISO();
+  const now   = new Date();
+  ['rf-date','ef-date','cf-date','elc-date','wlc-date'].forEach(id => { const el=qs(id); if(el) el.value=today; });
+  qs('ro-today-date').textContent    = fmtDate(now);
+  qs('etp-today-date').textContent   = fmtDate(now);
+  qs('co2-today-date').textContent   = fmtDate(now);
+  qs('elec-today-date').textContent  = fmtDate(now);
+  qs('water-today-date').textContent = fmtDate(now);
+});
+
+function todayISO() { return new Date().toISOString().split('T')[0]; }
+function fmtDate(d) { return d.toLocaleDateString('en-KE',{weekday:'short',day:'numeric',month:'short',year:'numeric'}); }
+
+// ═══════════════════════════════════════════════
+//  API
+// ═══════════════════════════════════════════════
+async function apiFetch(payload) {
+  if (isDemoMode) return getDemoResponse(payload);
+  payload.clientKey = CLIENT_KEY;
+  const res = await fetch(API_URL, { method:'POST', body:JSON.stringify(payload) });
+  return res.json();
+}
+
+// ═══════════════════════════════════════════════
+//  LOGIN
+// ═══════════════════════════════════════════════
+async function doLogin() {
+  const email   = qs('li-email').value.trim().toLowerCase();
+  const staffId = qs('li-staffid').value.trim().toUpperCase();
+  hide('li-err');
+  if (!email || !staffId) { showErr('li-err','Enter email and Staff ID.'); return; }
+  setBtn('li-btn-txt','li-spin',true);
+  try {
+    const res = await apiFetch({ action:'login', email, staffId });
+    if (res.success) {
+      currentUser = { email, staffId, name:res.name, dept:res.dept, role:res.role };
+      sessionStorage.setItem('wt_user', JSON.stringify(currentUser));
+      if (res.hasPin) { qs('pin-user-label').textContent=res.name||email; showPage('pg-pin'); pinBuffer=''; updateDots(); }
+      else bootApp();
+    } else showErr('li-err', res.error || 'Email or Staff ID not found.');
+  } catch(e) { showErr('li-err','Connection error. Try again.'); }
+  setBtn('li-btn-txt','li-spin',false);
+}
+
+// ═══════════════════════════════════════════════
+//  PIN
+// ═══════════════════════════════════════════════
+function pinKey(d) { if (pinBuffer.length>=4) return; pinBuffer+=d; updateDots(); if(pinBuffer.length===4) submitPin(); }
+function pinDel()  { pinBuffer=pinBuffer.slice(0,-1); updateDots(); }
+function updateDots() { for(let i=0;i<4;i++) { const el=document.getElementById('pd'+i); el.className='pin-dot'+(i<pinBuffer.length?' filled':''); } }
+async function submitPin() {
+  hide('pin-err');
+  const hash = await sha256(`${currentUser.email}:${currentUser.staffId}:${pinBuffer}`);
+  try {
+    const res = await apiFetch({ action:'verifyPin', email:currentUser.email, staffId:currentUser.staffId, pinHash:hash });
+    if (res.success) bootApp();
+    else {
+      for(let i=0;i<4;i++) document.getElementById('pd'+i).className='pin-dot err-dot';
+      setTimeout(()=>{ pinBuffer=''; updateDots(); },800);
+      showErr('pin-err','Incorrect PIN. Try again.');
+    }
+  } catch(e) { showErr('pin-err','Connection error.'); pinBuffer=''; updateDots(); }
+}
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════
+function bootApp() {
+  showPage('pg-app');
+  const u = currentUser;
+  const initials = u.name ? u.name.split(' ').map(p=>p[0]).join('').toUpperCase().slice(0,2) : '??';
+  qs('acct-av').textContent   = initials;
+  qs('acct-name').textContent = u.name || u.email;
+  qs('acct-id').textContent   = `${u.staffId}${u.dept ? ' · '+u.dept : ''}`;
+  qs('hdr-sub').textContent   = u.name ? `Hello, ${u.name.split(' ')[0]}` : 'Savannah Brands';
+  qs('hdr-date').textContent  = new Date().toLocaleDateString('en-KE',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  if (u.name) { qs('rf-checked').value = u.name; qs('ef-checked').value = u.name; qs('cf-checked').value = u.name; qs('log-by').value = u.name; qs('elc-by').value = u.name; qs('wlc-by').value = u.name; }
+  qs('log-date').value = todayISO();
+  const h = new Date().getHours();
+  qs('dash-greeting').textContent = (h<12?'Good morning':h<17?'Good afternoon':'Good evening')+(u.name?`, ${u.name.split(' ')[0]}`:'');
+  qs('dash-date').textContent = new Date().toLocaleDateString('en-KE',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  buildEquipList();
+  showModGrid();
+}
+
+// ═══════════════════════════════════════════════
+//  MODULE GRID NAVIGATION
+// ═══════════════════════════════════════════════
+function openModule(mod) {
+  hide('mod-grid-view');
+  switchModule(mod);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showModGrid() {
+  show('mod-grid-view');
+  ['ro','etp','co2','elec','maint','water'].forEach(m => qs(m+'-section').classList.add('hidden'));
+  qs('hdr-logo').textContent  = '🏭';
+  qs('hdr-title').textContent = 'Utilities Monitor';
+}
+
+// ═══════════════════════════════════════════════
+//  MODULE SWITCH
+// ═══════════════════════════════════════════════
+function switchModule(mod) {
+  currentModule = mod;
+  qs('mod-tab-ro').className    = 'module-tab' + (mod==='ro'    ? ' active-ro'   : '');
+  qs('mod-tab-etp').className   = 'module-tab' + (mod==='etp'   ? ' active-etp'  : '');
+  qs('mod-tab-co2').className   = 'module-tab' + (mod==='co2'   ? ' active-co2'  : '');
+  qs('mod-tab-elec').className  = 'module-tab' + (mod==='elec'  ? ' active-elec' : '');
+  qs('mod-tab-maint').className = 'module-tab' + (mod==='maint' ? ' active-maint': '');
+  qs('mod-tab-water').className = 'module-tab' + (mod==='water' ? ' active-water': '');
+  qs('ro-section').classList.toggle('hidden',    mod !== 'ro');
+  qs('etp-section').classList.toggle('hidden',   mod !== 'etp');
+  qs('co2-section').classList.toggle('hidden',   mod !== 'co2');
+  qs('elec-section').classList.toggle('hidden',  mod !== 'elec');
+  qs('maint-section').classList.toggle('hidden', mod !== 'maint');
+  qs('water-section').classList.toggle('hidden', mod !== 'water');
+  const logos  = { ro:'🌊', etp:'♻️', co2:'🧪', elec:'⚡', maint:'🔧', water:'💧' };
+  const titles = { ro:'RO Monitoring', etp:'ETP Monitoring', co2:'Bulk CO₂', elec:'Electricity', maint:'Maintenance', water:'Water Meters' };
+  qs('hdr-logo').textContent  = logos[mod];
+  qs('hdr-title').textContent = titles[mod];
+  if (mod === 'ro')    { switchPlant(currentPlant); }
+  if (mod === 'etp')   { loadETPRecords(); }
+  if (mod === 'co2')   { loadCO2Records(); }
+  if (mod === 'elec')  { loadElecRecords(); }
+  if (mod === 'maint') { loadMaintSchedule(); }
+  if (mod === 'water') { loadWaterRecords(); }
+}
+
+// ═══════════════════════════════════════════════
+//  RO — PLANT SWITCH
+// ═══════════════════════════════════════════════
+function switchPlant(plant) {
+  currentPlant = plant;
+  ['2000','4000'].forEach(p => qs(`tab-${p}`).classList.toggle('active', p===plant));
+  qs('ro-form-plant-lbl').textContent = `${plant} L/Hr`;
+  qs('rf-ctrl-wrap').classList.toggle('hidden', plant === '2000');
+  hide('ro-entry-form'); show('ro-log-btn-wrap');
+  updateROTodayBadges();
+  loadRORecords();
+}
+
+// ═══════════════════════════════════════════════
+//  RO — FORM
+// ═══════════════════════════════════════════════
+function showRoForm() {
+  hide('ro-log-btn-wrap'); show('ro-entry-form'); hide('rf-msg');
+  const d = roToday[currentPlant] || {};
+  if (!d['0800HRS']) qs('rf-time').value = '0800HRS';
+  else if (!d['1730HRS']) qs('rf-time').value = '1730HRS';
+  window.scrollTo({top: qs('ro-entry-form').offsetTop - 60, behavior:'smooth'});
+}
+function hideRoForm() { show('ro-log-btn-wrap'); hide('ro-entry-form'); }
+
+async function submitRO() {
+  const date    = qs('rf-date').value;
+  const checked = qs('rf-checked').value.trim();
+  if (!date)    { formMsg('rf-msg','bad','Please select a date.'); return; }
+  if (!checked) { formMsg('rf-msg','bad','Please enter who checked this reading.'); return; }
+  setBtn('rf-submit-txt','rf-submit-spin',true);
+  try {
+    const res = await apiFetch({
+      action:'submitRO', email:currentUser.email, staffId:currentUser.staffId,
+      plant:currentPlant, date, time:qs('rf-time').value,
+      rawWaterLevel:numVal('rf-raw'), ufTankLevel:numVal('rf-uf'), roTankLevel:numVal('rf-ro-tank'),
+      ufCondition:qs('rf-uf-cond').value, roCondition:qs('rf-ro-cond').value,
+      dmfFilters:qs('rf-dmf').value, antiscalant:qs('rf-antiscalant').value,
+      rawWaterPump:qs('rf-raw-pump').value, highPressurePump:qs('rf-hp-pump').value,
+      membranes:qs('rf-membranes').value,
+      controlPanel: currentPlant==='4000' ? qs('rf-ctrl').value : null,
+      cleanWaterRatio:numVal('rf-ratio'), ph:numVal('rf-ph'),
+      checkedBy:checked, confirmedBy:qs('rf-confirmed').value.trim(),
+      comments:qs('rf-comments').value.trim()
+    });
+    if (res.success) {
+      formMsg('rf-msg','ok',`Reading saved.${res.alerts?' ⚠ Supervisor alert sent.':''}`);
+      clearROForm(); await loadRORecords(); setTimeout(hideRoForm, 2000);
+    } else formMsg('rf-msg','bad', res.error||'Error saving.');
+  } catch(e) { formMsg('rf-msg','bad','Connection error.'); }
+  setBtn('rf-submit-txt','rf-submit-spin',false);
+}
+
+function clearROForm() {
+  ['rf-raw','rf-uf','rf-ro-tank','rf-ratio','rf-ph','rf-confirmed','rf-comments'].forEach(id=>qs(id).value='');
+  ['rf-uf-cond','rf-ro-cond','rf-dmf','rf-antiscalant','rf-membranes'].forEach(id=>{ qs(id).selectedIndex=0; colorStatus(qs(id)); });
+  resetToggle('rf-raw-pump'); resetToggle('rf-hp-pump'); resetToggle('rf-ctrl');
+  qs('rf-date').value = todayISO();
+}
+
+// ═══════════════════════════════════════════════
+//  RO — LOAD RECORDS
+// ═══════════════════════════════════════════════
+async function loadRORecords() {
+  qs('ro-records-list').innerHTML = '<div class="no-records">Loading…</div>';
+  try {
+    const res = await apiFetch({ action:'getRORecords', email:currentUser.email, staffId:currentUser.staffId, plant:currentPlant });
+    if (res.success) {
+      if (res.todayReadings) {
+        if (!roToday[currentPlant]) roToday[currentPlant] = {};
+        Object.assign(roToday[currentPlant], res.todayReadings);
+        updateROTodayBadges();
+      }
+      checkROAlerts(res.records);
+      renderRORecords(res.records);
+    }
+  } catch(e) { qs('ro-records-list').innerHTML='<div class="no-records">Failed to load.</div>'; }
+}
+
+function updateROTodayBadges() {
+  const d = roToday[currentPlant] || {};
+  setShift('ro-shift-0800','ro-s0800', d['0800HRS']);
+  setShift('ro-shift-1730','ro-s1730', d['1730HRS']);
+}
+
+function checkROAlerts(records) {
+  hide('ro-alert-banner');
+  const today = todayISO();
+  const issues = [];
+  (records||[]).filter(r=>r.date===today).forEach(r=>{
+    if (isBad(r.dmfFilters))        issues.push(`DMF: ${r.dmfFilters}`);
+    if (r.rawWaterPump==='Not ok')  issues.push('Raw pump: Not ok');
+    if (r.highPressurePump==='Not ok') issues.push('HP pump: Not ok');
+    if (isBad(r.roCondition))       issues.push(`RO Plant: ${r.roCondition}`);
+  });
+  if (issues.length) { qs('ro-alert-banner').innerHTML='⚠ Issues today ('+currentPlant+' L/Hr): '+issues.join(' · '); show('ro-alert-banner'); }
+}
+
+function renderRORecords(records) {
+  if (!records||!records.length) { qs('ro-records-list').innerHTML='<div class="no-records">No records yet for this plant.</div>'; return; }
+  qs('ro-records-list').innerHTML = records.map(r => {
+    const tanks = [
+      r.rawWaterLevel!=null ? `<div class="tank-pill"><div class="tank-lbl">Raw</div><div class="tank-val">${fmtL(r.rawWaterLevel)}</div></div>` : '',
+      r.ufTankLevel!=null   ? `<div class="tank-pill"><div class="tank-lbl">UF</div><div class="tank-val">${fmtL(r.ufTankLevel)}</div></div>` : '',
+      r.roTankLevel!=null   ? `<div class="tank-pill"><div class="tank-lbl">RO</div><div class="tank-val">${fmtL(r.roTankLevel)}</div></div>` : ''
+    ].filter(Boolean).join('');
+    const badges = [
+      { lbl:`UF: ${r.ufCondition}`,   cls:statusClass(r.ufCondition) },
+      { lbl:`RO: ${r.roCondition}`,   cls:statusClass(r.roCondition) },
+      { lbl:`DMF: ${r.dmfFilters}`,   cls:statusClass(r.dmfFilters) },
+      { lbl:`Antiscalant: ${r.antiscalant}`, cls:statusClass(r.antiscalant) },
+      { lbl:`Raw pump: ${r.rawWaterPump}`,   cls:statusClass(r.rawWaterPump) },
+      { lbl:`HP pump: ${r.highPressurePump}`,cls:statusClass(r.highPressurePump) },
+      r.controlPanel ? { lbl:`Panel: ${r.controlPanel}`, cls:statusClass(r.controlPanel) } : null
+    ].filter(Boolean).map(b=>`<span class="rbadge ${b.cls}">${b.lbl}</span>`).join('');
+    return `<div class="rec-item">
+      <div class="rec-top"><span class="rec-datetime">${r.date} · ${r.time}</span><span class="rec-by">By ${r.checkedBy||'—'}</span></div>
+      ${tanks ? `<div class="rec-tanks">${tanks}</div>` : ''}
+      <div class="rec-badges">${badges}</div>
+      ${r.cleanWaterRatio!=null ? `<div style="font-size:11px;color:var(--gray)">Clean water ratio: <strong>${r.cleanWaterRatio}%</strong>${r.ph!=null?` · pH: <strong>${r.ph}</strong>`:''}</div>` : ''}
+      ${r.comments ? `<div class="rec-comment">"${r.comments}"</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  ETP — FORM
+// ═══════════════════════════════════════════════
+function showEtpForm() {
+  hide('etp-log-btn-wrap'); show('etp-entry-form'); hide('ef-msg');
+  if (!etpToday['1000HRS']) qs('ef-time').value='1000HRS';
+  else if (!etpToday['1600HRS']) qs('ef-time').value='1600HRS';
+  window.scrollTo({top: qs('etp-entry-form').offsetTop - 60, behavior:'smooth'});
+}
+function hideEtpForm() { show('etp-log-btn-wrap'); hide('etp-entry-form'); }
+
+async function submitETP() {
+  const date    = qs('ef-date').value;
+  const checked = qs('ef-checked').value.trim();
+  if (!date)    { formMsg('ef-msg','bad','Please select a date.'); return; }
+  if (!checked) { formMsg('ef-msg','bad','Please enter who checked this reading.'); return; }
+  setBtn('ef-submit-txt','ef-submit-spin',true);
+  try {
+    const res = await apiFetch({
+      action:'submitETP', email:currentUser.email, staffId:currentUser.staffId,
+      date, time:qs('ef-time').value,
+      eqLevel:numVal('ef-eq'), lamellaLevel:numVal('ef-lamella'),
+      aerationLevel:numVal('ef-aeration'), postTreatLevel:numVal('ef-posttreat'),
+      coagDozing:qs('ef-coag').value, flocDozing:qs('ef-floc').value,
+      dmfPump:qs('ef-dmf').value, pipework:qs('ef-pipework').value,
+      dischargeCompliance:qs('ef-compliance').value,
+      ph:numVal('ef-ph'), tds:numVal('ef-tds'),
+      tss:numVal('ef-tss'), bod:numVal('ef-bod'), cod:numVal('ef-cod'),
+      nitrate:numVal('ef-nitrate'), color:qs('ef-color').value.trim(),
+      checkedBy:checked, confirmedBy:qs('ef-confirmed').value.trim(),
+      comments:qs('ef-comments').value.trim()
+    });
+    if (res.success) {
+      formMsg('ef-msg','ok',`ETP reading saved.${res.alerts?' ⚠ Supervisor alert sent.':''}`);
+      clearETPForm(); await loadETPRecords(); setTimeout(hideEtpForm, 2000);
+    } else formMsg('ef-msg','bad', res.error||'Error saving.');
+  } catch(e) { formMsg('ef-msg','bad','Connection error.'); }
+  setBtn('ef-submit-txt','ef-submit-spin',false);
+}
+
+function clearETPForm() {
+  ['ef-eq','ef-lamella','ef-aeration','ef-posttreat','ef-ph','ef-tds','ef-tss','ef-bod','ef-cod','ef-nitrate','ef-color','ef-confirmed','ef-comments'].forEach(id=>qs(id).value='');
+  resetToggle('ef-coag'); resetToggle('ef-floc'); resetToggle('ef-dmf'); resetToggle('ef-pipework');
+  setCompliance('Yes', qs('etp-entry-form').querySelector('.comp-btn'));
+  qs('ef-date').value=todayISO();
+  ['ef-ph-hint','ef-tds-hint'].forEach(id=>{ qs(id).className='param-hint'; });
+}
+
+// ═══════════════════════════════════════════════
+//  ETP — LOAD RECORDS
+// ═══════════════════════════════════════════════
+async function loadETPRecords() {
+  qs('etp-records-list').innerHTML='<div class="no-records">Loading…</div>';
+  try {
+    const res = await apiFetch({ action:'getETPRecords', email:currentUser.email, staffId:currentUser.staffId });
+    if (res.success) {
+      if (res.todayReadings) { etpToday = res.todayReadings; updateETPTodayBadges(); }
+      checkETPAlerts(res.records);
+      renderETPRecords(res.records);
+    }
+  } catch(e) { qs('etp-records-list').innerHTML='<div class="no-records">Failed to load.</div>'; }
+}
+
+function updateETPTodayBadges() {
+  setShift('etp-shift-1000','etp-s1000', etpToday['1000HRS']);
+  setShift('etp-shift-1600','etp-s1600', etpToday['1600HRS']);
+}
+
+function checkETPAlerts(records) {
+  hide('etp-alert-banner');
+  const today = todayISO();
+  const issues = [];
+  (records||[]).filter(r=>r.date===today).forEach(r=>{
+    if (r.dischargeCompliance==='No')      issues.push('Discharge NOT meeting parameters');
+    if (r.coagDozing==='Not okay')         issues.push('Coagulation dozing: Not okay');
+    if (r.dmfPump==='Not okay')            issues.push('DMF pump: Not okay');
+    if (r.pipework==='Not okay')           issues.push('Pipework: Not okay');
+  });
+  if (issues.length) { qs('etp-alert-banner').innerHTML='⚠ ETP Issues today: '+issues.join(' · '); show('etp-alert-banner'); }
+}
+
+function renderETPRecords(records) {
+  if (!records||!records.length) { qs('etp-records-list').innerHTML='<div class="no-records">No ETP records yet.</div>'; return; }
+  qs('etp-records-list').innerHTML = records.map(r => {
+    const tanks = [
+      r.eqLevel!=null        ? `<div class="tank-pill"><div class="tank-lbl">Equil.</div><div class="tank-val">${r.eqLevel}L</div></div>` : '',
+      r.lamellaLevel!=null   ? `<div class="tank-pill"><div class="tank-lbl">Lamella</div><div class="tank-val">${r.lamellaLevel}L</div></div>` : '',
+      r.aerationLevel!=null  ? `<div class="tank-pill"><div class="tank-lbl">Aeration</div><div class="tank-val">${r.aerationLevel}L</div></div>` : '',
+      r.postTreatLevel!=null ? `<div class="tank-pill"><div class="tank-lbl">Post-Tr.</div><div class="tank-val">${r.postTreatLevel}L</div></div>` : ''
+    ].filter(Boolean).join('');
+    const compCls = r.dischargeCompliance==='Yes' ? 'compliant' : r.dischargeCompliance==='Partial' ? 'partial' : 'non-compliant';
+    const compTxt = r.dischargeCompliance==='Yes' ? '✓ Discharge Compliant' : r.dischargeCompliance==='Partial' ? '~ Partial Compliance' : '✗ NOT Compliant';
+    const equip = [
+      { lbl:`Coag: ${r.coagDozing}`,  cls:r.coagDozing==='Ok'?'ok':'bad' },
+      { lbl:`Floc: ${r.flocDozing}`,  cls:r.flocDozing==='Ok'?'ok':'bad' },
+      { lbl:`DMF: ${r.dmfPump}`,      cls:r.dmfPump==='Ok'?'ok':'bad' },
+      { lbl:`Pipework: ${r.pipework}`,cls:r.pipework==='Ok'?'ok':'bad' }
+    ].map(b=>`<span class="rbadge ${b.cls}">${b.lbl}</span>`).join('');
+    const params = [
+      r.ph!=null      ? `<span class="param-chip">pH <strong>${r.ph}</strong></span>` : '',
+      r.tds!=null     ? `<span class="param-chip">TDS <strong>${r.tds}</strong></span>` : '',
+      r.tss!=null     ? `<span class="param-chip">TSS <strong>${r.tss}</strong></span>` : '',
+      r.bod!=null     ? `<span class="param-chip">BOD <strong>${r.bod}</strong></span>` : '',
+      r.cod!=null     ? `<span class="param-chip">COD <strong>${r.cod}</strong></span>` : '',
+      r.nitrate!=null ? `<span class="param-chip">NO₃ <strong>${r.nitrate}</strong></span>` : '',
+      r.color         ? `<span class="param-chip">Color <strong>${r.color}</strong></span>` : ''
+    ].filter(Boolean).join('');
+    return `<div class="rec-item">
+      <div class="rec-top"><span class="rec-datetime">${r.date} · ${r.time}</span><span class="rec-by">By ${r.checkedBy||'—'}</span></div>
+      <span class="rbadge ${compCls}" style="display:inline-block;margin-bottom:6px">${compTxt}</span>
+      ${tanks ? `<div class="rec-tanks-4">${tanks}</div>` : ''}
+      <div class="rec-badges">${equip}</div>
+      ${params ? `<div class="rec-params">${params}</div>` : ''}
+      ${r.comments ? `<div class="rec-comment">"${r.comments}"</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  CO2 — FORM
+// ═══════════════════════════════════════════════
+function showCo2Form() {
+  hide('co2-log-btn-wrap'); show('co2-entry-form'); hide('cf-msg');
+  if (!co2Today['0900HRS']) qs('cf-time').value = '0900HRS';
+  else if (!co2Today['1500HRS']) qs('cf-time').value = '1500HRS';
+  window.scrollTo({top: qs('co2-entry-form').offsetTop - 60, behavior:'smooth'});
+}
+function hideCo2Form() { show('co2-log-btn-wrap'); hide('co2-entry-form'); }
+
+async function submitCO2() {
+  const date    = qs('cf-date').value;
+  const vol     = numVal('cf-volume');
+  const checked = qs('cf-checked').value.trim();
+  if (!date)    { formMsg('cf-msg','bad','Please select a date.'); return; }
+  if (vol===null){ formMsg('cf-msg','bad','Please enter the CO₂ volume.'); return; }
+  if (!checked) { formMsg('cf-msg','bad','Please enter who checked this reading.'); return; }
+  setBtn('cf-submit-txt','cf-submit-spin',true);
+  try {
+    const res = await apiFetch({
+      action:'submitCO2', email:currentUser.email, staffId:currentUser.staffId,
+      date, time:qs('cf-time').value,
+      volume:vol,
+      gauge1:numVal('cf-p1'), gauge2:numVal('cf-p2'), gauge3:numVal('cf-p3'),
+      vaporiserState:qs('cf-vaporiser').value,
+      leakDetection:qs('cf-leak').value,
+      tankCondition:qs('cf-tank-cond').value,
+      pipeworkCondition:qs('cf-pipe-cond').value,
+      foundation:qs('cf-foundation').value,
+      checkedBy:checked, confirmedBy:qs('cf-confirmed').value.trim(),
+      comments:qs('cf-comments').value.trim()
+    });
+    if (res.success) {
+      formMsg('cf-msg','ok',`CO₂ reading saved.${res.alerts?' ⚠ Supervisor alert sent.':''}`);
+      clearCO2Form(); await loadCO2Records(); setTimeout(hideCo2Form, 2000);
+    } else formMsg('cf-msg','bad', res.error||'Error saving.');
+  } catch(e) { formMsg('cf-msg','bad','Connection error.'); }
+  setBtn('cf-submit-txt','cf-submit-spin',false);
+}
+
+function clearCO2Form() {
+  ['cf-volume','cf-p1','cf-p2','cf-p3','cf-confirmed','cf-comments'].forEach(id=>qs(id).value='');
+  ['cf-p1-hint','cf-p2-hint','cf-p3-hint'].forEach(id=>{ const el=qs(id); el.className='pres-hint'; el.textContent=id.includes('p3')?'Range: 5–8 bar':'Range: 20–23 bar'; });
+  ['cf-p1','cf-p2','cf-p3'].forEach(id=>{ const el=qs(id); el.classList.remove('pres-ok','pres-warn'); });
+  resetToggle('cf-vaporiser'); resetToggle('cf-leak'); resetToggle('cf-foundation');
+  qs('cf-tank-cond').selectedIndex=0; colorStatus(qs('cf-tank-cond'));
+  qs('cf-pipe-cond').selectedIndex=0; colorStatus(qs('cf-pipe-cond'));
+  qs('cf-date').value = todayISO();
+}
+
+// ═══════════════════════════════════════════════
+//  CO2 — LOAD RECORDS
+// ═══════════════════════════════════════════════
+async function loadCO2Records() {
+  qs('co2-records-list').innerHTML='<div class="no-records">Loading…</div>';
+  try {
+    const res = await apiFetch({ action:'getCO2Records', email:currentUser.email, staffId:currentUser.staffId });
+    if (res.success) {
+      if (res.todayReadings) { co2Today = res.todayReadings; updateCO2TodayBadges(); }
+      if (res.records && res.records.length) {
+        const last = res.records[0];
+        co2LatestVol = last.volume;
+        co2RefCap = res.refCapacity || last.capacity || co2RefCap || 2000;
+        updateVolDisplay(last.volume);
+      }
+      checkCO2Alerts(res.records);
+      renderCO2Records(res.records);
+    }
+  } catch(e) { qs('co2-records-list').innerHTML='<div class="no-records">Failed to load.</div>'; }
+}
+
+function updateCO2TodayBadges() {
+  setShift('co2-shift-0900','co2-s0900', co2Today['0900HRS']);
+  setShift('co2-shift-1500','co2-s1500', co2Today['1500HRS']);
+}
+
+function updateVolDisplay(vol) {
+  qs('co2-vol-kg').textContent = vol != null ? vol.toLocaleString() : '—';
+  // Use last known reading as reference if we have context, otherwise show bar scaled to 2000kg
+  const ref = co2RefCap || 2000;
+  const pct = Math.min(100, Math.max(0, (vol / ref) * 100));
+  const fill = qs('co2-vol-bar');
+  fill.style.width = pct + '%';
+  fill.style.background = pct < 15 ? 'var(--red)' : pct < 35 ? 'var(--amber)' : 'var(--teal)';
+  qs('co2-vol-pct').textContent = pct.toFixed(0) + '% of reference';
+  qs('co2-vol-ref').textContent = `Ref: ${ref} kg`;
+}
+
+function updateVolBar() {
+  const v = numVal('cf-volume');
+  if (v !== null) updateVolDisplay(v);
+}
+
+function checkCO2Alerts(records) {
+  hide('co2-alert-banner');
+  const today = todayISO();
+  const issues = [];
+  (records||[]).filter(r=>r.date===today).forEach(r=>{
+    if (r.leakDetection === 'Leakage detected') issues.push('🚨 CO₂ Leakage detected!');
+    if (r.foundation === 'Sinking')             issues.push('🚨 Foundation sinking!');
+    if (r.gauge1!=null && (r.gauge1<20||r.gauge1>23)) issues.push(`Gauge 1: ${r.gauge1} bar (out of 20–23 range)`);
+    if (r.gauge2!=null && (r.gauge2<20||r.gauge2>23)) issues.push(`Gauge 2: ${r.gauge2} bar (out of 20–23 range)`);
+    if (r.gauge3!=null && (r.gauge3<5||r.gauge3>8))   issues.push(`Gauge 3: ${r.gauge3} bar (out of 5–8 range)`);
+  });
+  if (issues.length) { qs('co2-alert-banner').innerHTML='⚠ CO₂ Issues today: '+issues.join(' · '); show('co2-alert-banner'); }
+}
+
+function renderCO2Records(records) {
+  if (!records||!records.length) { qs('co2-records-list').innerHTML='<div class="no-records">No CO₂ records yet.</div>'; return; }
+  qs('co2-records-list').innerHTML = records.map((r,i) => {
+    const prev = records[i+1];
+    const diff = (prev && prev.volume!=null && r.volume!=null) ? (r.volume - prev.volume) : null;
+    const diffHtml = diff !== null
+      ? `<span style="font-size:11px;color:${diff<0?'var(--red)':'var(--teal)'}"> ${diff<0?'▼':'▲'} ${Math.abs(diff).toFixed(0)} kg</span>`
+      : '';
+    const leakCls   = r.leakDetection==='No leakage' ? 'ok' : 'bad';
+    const foundCls  = r.foundation==='Anchoring secure' ? 'ok' : 'bad';
+    const vaporCls  = r.vaporiserState==='Not all frozen' ? 'info' : 'warn';
+    const gauges = [
+      r.gauge1!=null ? `<span class="param-chip">G1 <strong class="${r.gauge1<20||r.gauge1>23?'':''}${r.gauge1<20||r.gauge1>23?'style=color:var(--red)':''}">${r.gauge1}</strong> bar</span>` : '',
+      r.gauge2!=null ? `<span class="param-chip">G2 <strong>${r.gauge2}</strong> bar</span>` : '',
+      r.gauge3!=null ? `<span class="param-chip">G3 <strong>${r.gauge3}</strong> bar</span>` : ''
+    ].filter(Boolean).join('');
+    return `<div class="rec-item">
+      <div class="rec-top">
+        <span class="rec-datetime">${r.date} · ${r.time}</span>
+        <span class="rec-by">By ${r.checkedBy||'—'}</span>
+      </div>
+      <div style="font-size:20px;font-weight:800;color:var(--blue-dk);margin-bottom:6px">${r.volume!=null?r.volume.toLocaleString()+' kg':'—'}${diffHtml}</div>
+      <div class="rec-badges">
+        <span class="rbadge ${leakCls}">${r.leakDetection}</span>
+        <span class="rbadge ${foundCls}">${r.foundation}</span>
+        <span class="rbadge ${vaporCls}">${r.vaporiserState}</span>
+        <span class="rbadge ${statusClass(r.tankCondition)}">${r.tankCondition}</span>
+        <span class="rbadge ${statusClass(r.pipeworkCondition)}">${r.pipeworkCondition}</span>
+      </div>
+      ${gauges ? `<div class="rec-params" style="margin-top:4px">${gauges}</div>` : ''}
+      ${r.comments ? `<div class="rec-comment">"${r.comments}"</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── CO2 Pressure coloring ──
+function colorPressure(inputId, min, max, hintId) {
+  const v = parseFloat(qs(inputId).value);
+  const el = qs(inputId); const hint = qs(hintId);
+  el.classList.remove('pres-ok','pres-warn');
+  if (isNaN(v)) { hint.className='pres-hint'; hint.textContent=`Range: ${min}–${max} bar`; return; }
+  if (v < min || v > max) {
+    el.classList.add('pres-warn');
+    hint.className='pres-hint out-range'; hint.textContent=`⚠ Out of range — expected ${min}–${max} bar`;
+  } else {
+    el.classList.add('pres-ok');
+    hint.className='pres-hint in-range'; hint.textContent=`✓ In range (${min}–${max} bar)`;
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  UI HELPERS
+// ═══════════════════════════════════════════════
+function setToggle(hiddenId, val, btn) {
+  qs(hiddenId).value = val;
+  btn.closest('.ok-toggle').querySelectorAll('.ok-btn').forEach(b=>b.classList.remove('sel-ok','sel-notok'));
+  btn.classList.add(val==='Ok' ? 'sel-ok' : 'sel-notok');
+}
+function resetToggle(hiddenId) {
+  const el = qs(hiddenId);
+  if (!el) return;
+  el.value = el.defaultValue;
+  const wrap = el.parentElement;
+  if (!wrap) return;
+  const btns = wrap.querySelectorAll('.ok-btn');
+  btns.forEach((b,i) => { b.classList.remove('sel-ok','sel-notok'); if(i===0) b.classList.add('sel-ok'); });
+}
+function setCompliance(val, btn) {
+  qs('ef-compliance').value = val;
+  document.querySelectorAll('.comp-btn').forEach(b=>b.classList.remove('sel-yes','sel-partial','sel-no'));
+  if (btn) btn.classList.add(val==='Yes'?'sel-yes':val==='Partial'?'sel-partial':'sel-no');
+}
+
+function colorStatus(sel) {
+  sel.className = sel.className.replace(/status-\w+/g,'');
+  const cls = statusClass(sel.value);
+  if (cls==='ok')   sel.classList.add('status-ok');
+  if (cls==='warn') sel.classList.add('status-warn');
+  if (cls==='bad')  sel.classList.add('status-bad');
+}
+
+function hintParam(inputId, ref, min, max, hintId) {
+  const v = parseFloat(qs(inputId).value);
+  const el = qs(hintId);
+  if (isNaN(v)) { el.className='param-hint'; return; }
+  if (v < min || v > max) { el.className='param-hint out'; el.textContent=`⚠ Out of range (${min}–${max})`; }
+  else el.className='param-hint';
+}
+
+function setShift(pillId, statusId, done) {
+  qs(pillId).className = 'shift-pill ' + (done ? 'done' : 'pending');
+  qs(statusId).textContent = done ? '✓ Logged' : 'Not logged';
+}
+
+const GOOD_VALS = ['functioning well','in good condition','ok','good level','replaced','cip in progress'];
+const WARN_VALS = ['slight leakage','medium level','low level','minor issue','not so well','needs cleaning','needs backwash','needs refill','under maintenance'];
+const BAD_VALS  = ['leakage','not ok','not okay','not functioning','empty - refilled'];
+
+function statusClass(val) {
+  if (!val) return 'info';
+  const v = val.toLowerCase();
+  if (BAD_VALS.some(b  => v.includes(b)))  return 'bad';
+  if (GOOD_VALS.some(g => v===g||v.includes(g))) return 'ok';
+  if (WARN_VALS.some(w => v.includes(w.split(' ')[0]))) return 'warn';
+  return 'info';
+}
+function isBad(val) { const c=statusClass(val); return c==='bad'||c==='warn'; }
+
+function qs(id)      { return document.getElementById(id); }
+function show(id)    { qs(id)?.classList.remove('hidden'); }
+function hide(id)    { qs(id)?.classList.add('hidden'); }
+function showPage(id){ ['pg-loading','pg-login','pg-pin','pg-app'].forEach(p=>{ qs(p)?.classList.add('hidden'); }); show(id); }
+function showErr(id,msg){ const e=qs(id); e.textContent=msg; show(id); }
+function setBtn(tId,sId,load){ qs(tId).classList.toggle('hidden',load); qs(sId).classList.toggle('hidden',!load); }
+function numVal(id)  { const v=parseFloat(qs(id)?.value); return isNaN(v)?null:v; }
+function fmtL(v)     { return v>=1000?(v/1000).toFixed(1)+'k L':v+' L'; }
+function formMsg(id,type,msg){ const e=qs(id); e.textContent=msg; e.className='form-msg '+type; show(id); }
+// ═══════════════════════════════════════════════
+//  DEMO MODE
+// ═══════════════════════════════════════════════
+function demoLogin() {
+  isDemoMode = true;
+  currentUser = { email:'demo@savannahbrands.co.ke', staffId:'DEMO01', name:'Victor Bett', dept:'Utilities', role:'Operator' };
+  bootApp();
+  show('demo-banner');
+}
+
+function _od(n) { const d=new Date(); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; }
+
+function getDemoResponse(p) {
+  const t=todayISO(), y=_od(-1), y2=_od(-2), y7=_od(-7), y15=_od(-15), y30=_od(-30), y95=_od(-95), y200=_od(-200);
+
+  // All write actions succeed silently
+  if (['submitRO','submitETP','submitCO2','submitElec','logMaintenance','submitWater'].includes(p.action))
+    return { success:true };
+
+  if (p.action === 'getRORecords') {
+    const pl = p.plant||'2000';
+    if (pl==='2000') return { success:true, todayReadings:{'0800HRS':true},
+      records:[
+        { date:t, time:'0800HRS', rawWaterLevel:18500, ufTankLevel:12000, roTankLevel:9000,
+          ufCondition:'Functioning well', roCondition:'Functioning well', dmfFilters:'In good condition',
+          antiscalant:'Good level', rawWaterPump:'Ok', highPressurePump:'Ok',
+          membranes:'Functioning well', cleanWaterRatio:67.5, ph:7.1, checkedBy:'Victor Bett', confirmedBy:'J. Mwangi', comments:'All systems normal' },
+        { date:y, time:'1730HRS', rawWaterLevel:17200, ufTankLevel:11500, roTankLevel:8200,
+          ufCondition:'Functioning well', roCondition:'Minor issue', dmfFilters:'Needs backwash',
+          antiscalant:'Medium level', rawWaterPump:'Ok', highPressurePump:'Not ok',
+          membranes:'Functioning well', cleanWaterRatio:64.8, ph:7.3, checkedBy:'Victor Bett', confirmedBy:'', comments:'HP pump vibrating — flagged for maintenance' },
+        { date:y, time:'0800HRS', rawWaterLevel:17800, ufTankLevel:11900, roTankLevel:8600,
+          ufCondition:'Functioning well', roCondition:'Functioning well', dmfFilters:'In good condition',
+          antiscalant:'Good level', rawWaterPump:'Ok', highPressurePump:'Ok',
+          membranes:'Functioning well', cleanWaterRatio:67.0, ph:7.0, checkedBy:'Victor Bett', confirmedBy:'', comments:'' },
+        { date:y2, time:'1730HRS', rawWaterLevel:17000, ufTankLevel:11200, roTankLevel:7900,
+          ufCondition:'In good condition', roCondition:'In good condition', dmfFilters:'Functioning well',
+          antiscalant:'Good level', rawWaterPump:'Ok', highPressurePump:'Ok',
+          membranes:'Needs cleaning', cleanWaterRatio:65.5, ph:7.2, checkedBy:'Victor Bett', confirmedBy:'', comments:'Membranes scheduled for CIP next week' },
+      ]};
+    return { success:true, todayReadings:{},
+      records:[
+        { date:y, time:'0800HRS', rawWaterLevel:32000, ufTankLevel:19000, roTankLevel:14500,
+          ufCondition:'Functioning well', roCondition:'Functioning well', dmfFilters:'Functioning well',
+          antiscalant:'Good level', rawWaterPump:'Ok', highPressurePump:'Ok',
+          membranes:'Functioning well', controlPanel:'Ok', cleanWaterRatio:68.2, ph:7.0, checkedBy:'Victor Bett', confirmedBy:'', comments:'' },
+        { date:y2, time:'1730HRS', rawWaterLevel:31500, ufTankLevel:18500, roTankLevel:14000,
+          ufCondition:'Functioning well', roCondition:'Functioning well', dmfFilters:'In good condition',
+          antiscalant:'Medium level', rawWaterPump:'Ok', highPressurePump:'Ok',
+          membranes:'Functioning well', controlPanel:'Ok', cleanWaterRatio:67.8, ph:7.1, checkedBy:'Victor Bett', confirmedBy:'', comments:'' },
+      ]};
+  }
+
+  if (p.action === 'getETPRecords') return { success:true,
+    todayReadings:{'1000HRS':true},
+    records:[
+      { date:t, time:'1000HRS', eqLevel:85, lamellaLevel:72, aerationLevel:68, postTreatLevel:60,
+        coagDozing:'Ok', flocDozing:'Ok', dmfPump:'Ok', pipework:'Ok',
+        dischargeCompliance:'Partial', ph:7.4, tds:620, tss:38, bod:42, cod:88, nitrate:9.2,
+        color:'Light brown', checkedBy:'Victor Bett', confirmedBy:'', comments:'Slight colour — adjusting coagulant dose' },
+      { date:y, time:'1600HRS', eqLevel:80, lamellaLevel:70, aerationLevel:65, postTreatLevel:58,
+        coagDozing:'Ok', flocDozing:'Not ok', dmfPump:'Ok', pipework:'Ok',
+        dischargeCompliance:'Yes', ph:7.2, tds:580, tss:28, bod:35, cod:72, nitrate:8.8,
+        color:'Clear', checkedBy:'Victor Bett', confirmedBy:'', comments:'Floc pump replaced' },
+      { date:y, time:'1000HRS', eqLevel:82, lamellaLevel:71, aerationLevel:66, postTreatLevel:59,
+        coagDozing:'Ok', flocDozing:'Ok', dmfPump:'Ok', pipework:'Ok',
+        dischargeCompliance:'Yes', ph:7.1, tds:590, tss:30, bod:37, cod:74, nitrate:8.5,
+        color:'Clear', checkedBy:'Victor Bett', confirmedBy:'J. Mwangi', comments:'' },
+    ]};
+
+  if (p.action === 'getCO2Records') return { success:true,
+    latestVolume:1820, refCapacity:2500, todayReadings:{'0900HRS':true},
+    records:[
+      { date:t, time:'0900HRS', volume:1820, capacity:2500, gauge1:21.5, gauge2:21.8, gauge3:6.2,
+        vaporiserState:'Not all frozen', leakDetection:'No leakage', tankCondition:'In good condition',
+        pipeworkCondition:'In good condition', foundation:'Anchoring secure',
+        checkedBy:'Victor Bett', confirmedBy:'', comments:'' },
+      { date:y, time:'1500HRS', volume:1880, capacity:2500, gauge1:21.2, gauge2:21.6, gauge3:6.0,
+        vaporiserState:'Not all frozen', leakDetection:'No leakage', tankCondition:'In good condition',
+        pipeworkCondition:'In good condition', foundation:'Anchoring secure',
+        checkedBy:'Victor Bett', confirmedBy:'', comments:'' },
+      { date:y, time:'0900HRS', volume:1940, capacity:2500, gauge1:21.0, gauge2:21.4, gauge3:6.1,
+        vaporiserState:'Not all frozen', leakDetection:'No leakage', tankCondition:'In good condition',
+        pipeworkCondition:'Minor leakage', foundation:'Anchoring secure',
+        checkedBy:'Victor Bett', confirmedBy:'', comments:'Minor drip at east fitting — tightened' },
+      { date:y2, time:'1500HRS', volume:2020, capacity:2500, gauge1:21.3, gauge2:21.7, gauge3:6.3,
+        vaporiserState:'Not all frozen', leakDetection:'No leakage', tankCondition:'In good condition',
+        pipeworkCondition:'In good condition', foundation:'Anchoring secure',
+        checkedBy:'Victor Bett', confirmedBy:'', comments:'Delivery received: +400kg' },
+    ]};
+
+  if (p.action === 'getWaterRecords') return { success:true, todayDone:false,
+    records:[
+      { date:y,        readBy:'Victor Bett', wm1:285400, wm2:196200, wm3:142600, wm4:98300, rawTank:18500, roTank:9000, comments:'' },
+      { date:y7,       readBy:'Victor Bett', wm1:278300, wm2:191400, wm3:138200, wm4:95100, rawTank:17800, roTank:8600, comments:'Month-end check' },
+      { date:_od(-14), readBy:'Victor Bett', wm1:271500, wm2:186900, wm3:134000, wm4:92200, rawTank:18200, roTank:9100, comments:'' },
+    ]};
+
+  if (p.action === 'getElecRecords') return { success:true, todayDone:false,
+    records:[
+      { date:y,  readBy:'Victor Bett', m1:47850, m2:9240, m3:6380, m4:3210, comments:'' },
+      { date:y7, readBy:'Victor Bett', m1:46380, m2:8960, m3:6120, m4:3060, comments:'Month-end reading' },
+      { date:_od(-14), readBy:'Victor Bett', m1:44920, m2:8690, m3:5880, m4:2940, comments:'' },
+    ]};
+
+  if (p.action === 'getSchedule') return { success:true, lastDone:{
+    // Daily — done today
+    'CHR-01':{ date:t,   by:'Victor Bett' },'CHR-02':{ date:t,   by:'Victor Bett' },
+    'PBL-01':{ date:t,   by:'Victor Bett' },'PBL-02':{ date:t,   by:'Victor Bett' },
+    'IAC-01':{ date:t,   by:'Victor Bett' },'IAC-02':{ date:t,   by:'Victor Bett' },
+    'IAC-03':{ date:t,   by:'Victor Bett' },'IAC-04':{ date:t,   by:'Victor Bett' },
+    'GEN-01':{ date:t,   by:'Victor Bett' },'GEN-02':{ date:t,   by:'Victor Bett' },
+    'ROP-01':{ date:t,   by:'Victor Bett' },'ROP-02':{ date:t,   by:'Victor Bett' },
+    'RBL-01':{ date:t,   by:'Victor Bett' },'CCL-01':{ date:t,   by:'Victor Bett' },
+    // Weekly — done 2–4 days ago (ok)
+    'CHR-03':{ date:_od(-2), by:'Victor Bett' },'CHR-04':{ date:_od(-2), by:'Victor Bett' },
+    'CHR-05':{ date:_od(-3), by:'Victor Bett' },'CHR-06':{ date:_od(-3), by:'Victor Bett' },
+    'IAC-06':{ date:_od(-4), by:'Victor Bett' },'IAC-07':{ date:_od(-4), by:'Victor Bett' },
+    'BFC-04':{ date:_od(-3), by:'Victor Bett' },'BFC-05':{ date:_od(-3), by:'Victor Bett' },
+    // Monthly — done 15 days ago (ok)
+    'CHR-07':{ date:y15, by:'Victor Bett' },'CHR-08':{ date:y15, by:'Victor Bett' },
+    // Monthly — done 28 days ago (due — within last 25%)
+    'CHR-09':{ date:_od(-28), by:'Victor Bett' },'CHR-10':{ date:_od(-28), by:'Victor Bett' },
+    'PBL-07':{ date:_od(-29), by:'Victor Bett' },'PBL-08':{ date:_od(-29), by:'Victor Bett' },
+    // Quarterly — done 95 days ago (overdue)
+    'CHR-12':{ date:y95,  by:'Victor Bett' },
+    'PWP-09':{ date:_od(-88), by:'Victor Bett' },
+    'IAC-15':{ date:_od(-92), by:'Victor Bett' },
+    'BFC-13':{ date:_od(-98), by:'Victor Bett' },
+    // 6-month — done 200 days ago (overdue)
+    'CHR-13':{ date:y200, by:'Victor Bett' },
+    'IAC-18':{ date:y200, by:'Victor Bett' },
+    // Yearly — done long ago (overdue)
+    'IAC-20':{ date:_od(-400), by:'Victor Bett' },
+  }};
+
+  return { success:true };
+}
+
+function toggleAcct(){ qs('acct-overlay').classList.toggle('hidden'); }
+function closeAcctBg(e){ if(e.target.id==='acct-overlay') hide('acct-overlay'); }
+function doLogout()  { sessionStorage.removeItem('wt_user'); currentUser=null; showPage('pg-login'); }
+
+// ═══════════════════════════════════════════════
+//  ELECTRICITY — FORM
+// ═══════════════════════════════════════════════
+function showElecForm() {
+  hide('elec-log-btn-wrap'); show('elec-entry-form'); hide('elc-msg');
+  METERS.forEach(m => {
+    const prev = elecPrev[m.id];
+    const el   = qs(`elc-${m.id}-prev`);
+    if (!el) return;
+    el.innerHTML = prev
+      ? `Previous: <strong>${prev.reading.toLocaleString()} kWh</strong> <span style="color:var(--gray)">(${prev.date})</span>`
+      : 'Previous: <em style="color:var(--gray)">First reading</em>';
+  });
+  window.scrollTo({ top: qs('elec-entry-form').offsetTop - 60, behavior:'smooth' });
+}
+function hideElecForm() { show('elec-log-btn-wrap'); hide('elec-entry-form'); }
+
+async function submitElec() {
+  const date = qs('elc-date').value;
+  const by   = qs('elc-by').value.trim();
+  if (!date) { formMsg('elc-msg','bad','Please select a date.'); return; }
+  if (!by)   { formMsg('elc-msg','bad','Please enter who read the meters.'); return; }
+  const m1 = numVal('elc-m1'), m2 = numVal('elc-m2'), m3 = numVal('elc-m3'), m4 = numVal('elc-m4');
+  if (m1===null && m2===null && m3===null && m4===null) { formMsg('elc-msg','bad','Enter at least one meter reading.'); return; }
+  setBtn('elc-submit-txt','elc-submit-spin',true);
+  try {
+    const res = await apiFetch({
+      action:'submitElec', email:currentUser.email, staffId:currentUser.staffId,
+      date, readBy:by, m1, m2, m3, m4,
+      comments: qs('elc-comments').value.trim()
+    });
+    if (res.success) {
+      formMsg('elc-msg','ok','Meter readings saved.');
+      clearElecForm();
+      await loadElecRecords();
+      setTimeout(hideElecForm, 2000);
+    } else formMsg('elc-msg','bad', res.error||'Error saving.');
+  } catch(e) { formMsg('elc-msg','bad','Connection error.'); }
+  setBtn('elc-submit-txt','elc-submit-spin',false);
+}
+
+function clearElecForm() {
+  ['elc-m1','elc-m2','elc-m3','elc-m4','elc-comments'].forEach(id => { const el=qs(id); if(el) el.value=''; });
+  qs('elc-date').value = todayISO();
+}
+
+// ═══════════════════════════════════════════════
+//  ELECTRICITY — RECORDS
+// ═══════════════════════════════════════════════
+async function loadElecRecords() {
+  qs('elec-records-list').innerHTML = '<div class="no-records">Loading…</div>';
+  try {
+    const res = await apiFetch({ action:'getElecRecords', email:currentUser.email, staffId:currentUser.staffId });
+    if (res.success) {
+      if (res.records && res.records.length) {
+        const latest = res.records[0];
+        elecPrev = {};
+        METERS.forEach(m => { if (latest[m.id] != null) elecPrev[m.id] = { reading: latest[m.id], date: latest.date }; });
+      }
+      elecToday = res.todayDone || false;
+      const statusEl = qs('elec-today-status');
+      if (statusEl) {
+        statusEl.textContent = elecToday ? '✓ Readings logged today' : 'No readings logged yet today';
+        statusEl.style.color = elecToday ? 'var(--green)' : 'var(--gray)';
+      }
+      renderElecRecords(res.records || []);
+    }
+  } catch(e) { qs('elec-records-list').innerHTML='<div class="no-records">Failed to load.</div>'; }
+}
+
+function renderElecRecords(records) {
+  if (!records.length) { qs('elec-records-list').innerHTML='<div class="no-records">No readings yet.</div>'; return; }
+  qs('elec-records-list').innerHTML = records.map((r, i) => {
+    const prev = records[i + 1];
+    const meterRows = METERS.map(m => {
+      const val = r[m.id];
+      if (val == null) return '';
+      let diffHtml = '';
+      if (prev && prev[m.id] != null) {
+        const diff = val - prev[m.id];
+        const sign = diff >= 0 ? '+' : '';
+        diffHtml = `<span class="elec-meter-diff up">${sign}${diff.toLocaleString()} kWh</span>`;
+      } else {
+        diffHtml = `<span class="elec-meter-diff first">First</span>`;
+      }
+      return `<div class="elec-meter-row">
+        <span class="elec-meter-lbl">${m.label} <span style="font-size:9px;color:#9ca3af">${m.sub}</span></span>
+        <span class="elec-meter-val">${val.toLocaleString()} kWh</span>
+        ${diffHtml}
+      </div>`;
+    }).filter(Boolean).join('');
+    return `<div class="elec-rec-item">
+      <div class="elec-rec-hdr">
+        <span class="elec-rec-date">${r.date}</span>
+        <span class="elec-rec-by">By ${r.readBy||'—'}</span>
+      </div>
+      <div>${meterRows}</div>
+      ${r.comments ? `<div class="rec-comment" style="margin-top:6px">"${r.comments}"</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  MAINTENANCE — STATUS CALCULATION
+// ═══════════════════════════════════════════════
+function taskStatus(task) {
+  const info = lastDoneMap[task.id];
+  const days = FREQ_DAYS[task.freq];
+  if (!info || !info.date) return 'overdue';
+  const last = new Date(info.date);
+  const next = new Date(last.getTime() + days * 86400000);
+  const now  = new Date();
+  if (now >= next) return 'overdue';
+  const daysLeft = (next - now) / 86400000;
+  if (daysLeft <= days * 0.25) return 'due';
+  return 'ok';
+}
+
+function daysOverdue(task) {
+  const info = lastDoneMap[task.id];
+  const days = FREQ_DAYS[task.freq];
+  if (!info || !info.date) return 999;
+  const last = new Date(info.date);
+  const next = new Date(last.getTime() + days * 86400000);
+  return Math.max(0, Math.round((new Date() - next) / 86400000));
+}
+
+function lastDoneStr(task) {
+  const info = lastDoneMap[task.id];
+  if (!info || !info.date) return 'Never done';
+  return `Last: ${info.date} · ${info.by || '—'}`;
+}
+
+// ═══════════════════════════════════════════════
+//  MAINTENANCE — DASHBOARD
+// ═══════════════════════════════════════════════
+function refreshMaintDashboard() {
+  let overdue=0, due=0, ok=0;
+  const allTasks = SCHEDULE.flatMap(e => e.tasks.map(t => ({...t, equip:e.name})));
+  allTasks.forEach(t => { const s=taskStatus(t); if(s==='overdue')overdue++; else if(s==='due')due++; else ok++; });
+  qs('st-overdue').textContent = overdue;
+  qs('st-due').textContent     = due;
+  qs('st-ok').textContent      = ok;
+  qs('st-done').textContent    = Object.values(lastDoneMap).filter(d => d.date === todayISO()).length;
+  qs('maint-log-badge').textContent = overdue + due;
+  qs('maint-log-badge').classList.toggle('hidden', overdue + due === 0);
+
+  const priorityTasks = allTasks
+    .filter(t => taskStatus(t) !== 'ok')
+    .sort((a,b) => {
+      const sa=taskStatus(a),sb=taskStatus(b);
+      if(sa==='overdue'&&sb!=='overdue') return -1;
+      if(sb==='overdue'&&sa!=='overdue') return 1;
+      return daysOverdue(b) - daysOverdue(a);
+    })
+    .slice(0, 20);
+
+  if (!priorityTasks.length) {
+    qs('dash-due-list').innerHTML = `<div style="background:white;border-radius:10px;border:1px solid var(--border);padding:20px;text-align:center;color:var(--green);font-weight:600;">✓ All tasks are up to date</div>`;
+    return;
+  }
+  qs('dash-due-list').innerHTML = priorityTasks.map(t => {
+    const s  = taskStatus(t);
+    const od = daysOverdue(t);
+    const meta = s==='overdue' ? (od>0 ? `${od} day${od!==1?'s':''} overdue` : 'Due now') : 'Due soon';
+    return `<div class="due-item" onclick="switchMaintView('log')">
+      <div class="due-dot ${s}"></div>
+      <div class="due-item-main">
+        <div class="due-item-task">${t.task}</div>
+        <div class="due-item-equip">${t.equip} · ${meta}</div>
+      </div>
+      <span class="due-item-freq freq-${t.freq}">${FREQ_LABEL[t.freq]}</span>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  MAINTENANCE — EQUIPMENT LIST
+// ═══════════════════════════════════════════════
+function buildEquipList() {
+  const el = qs('equip-list');
+  if (!el) return;
+  el.innerHTML = SCHEDULE.map(equip => {
+    const tasks = equip.tasks;
+    const counts = { overdue:0, due:0, ok:0 };
+    tasks.forEach(t => counts[taskStatus(t)]++);
+    const badgeHtml = [
+      counts.overdue ? `<span class="count-badge ov">${counts.overdue} overdue</span>` : '',
+      counts.due     ? `<span class="count-badge du">${counts.due} due</span>` : '',
+      counts.ok      ? `<span class="count-badge ok">${counts.ok} ok</span>` : ''
+    ].filter(Boolean).join('');
+    const taskHtml = tasks.map(t => {
+      const s = taskStatus(t);
+      return `<div class="task-item">
+        <div class="task-cb ${checkedTasks[t.id]?'checked':s}" id="cb-${t.id}" onclick="toggleTask('${t.id}')"></div>
+        <div class="task-info">
+          <div class="task-name">${t.task}</div>
+          <div class="task-meta">${FREQ_LABEL[t.freq]} · ${lastDoneStr(t)}</div>
+        </div>
+        <div class="task-status-dot" style="background:${s==='overdue'?'var(--red)':s==='due'?'var(--amber)':'var(--green)'}"></div>
+      </div>`;
+    }).join('');
+    return `<div class="equip-card">
+      <div class="equip-hdr" onclick="toggleEquip('eq-${equip.id}',this)">
+        <div class="equip-hdr-left">
+          <span class="equip-icon">${equip.icon}</span>
+          <span class="equip-name">${equip.name}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="equip-counts">${badgeHtml}</div>
+          <span class="equip-chevron" id="chv-${equip.id}">▼</span>
+        </div>
+      </div>
+      <div class="equip-tasks" id="eq-${equip.id}">${taskHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleEquip(panelId, hdrEl) {
+  const panel = qs(panelId);
+  const chv   = hdrEl.querySelector('.equip-chevron');
+  panel.classList.toggle('open');
+  chv.classList.toggle('open');
+}
+
+function toggleTask(taskId) {
+  if (checkedTasks[taskId]) delete checkedTasks[taskId];
+  else checkedTasks[taskId] = true;
+  const cb = qs('cb-'+taskId);
+  const t  = findTask(taskId);
+  if (cb) cb.className = 'task-cb ' + (checkedTasks[taskId] ? 'checked' : taskStatus(t));
+  updateSubmitBar();
+}
+
+function updateSubmitBar() {
+  const count = Object.keys(checkedTasks).length;
+  if (count > 0) { show('log-submit-bar'); show('log-extra'); }
+  else { hide('log-submit-bar'); hide('log-extra'); }
+  qs('log-submit-txt').textContent = `Submit ${count} Task${count!==1?'s':''}`;
+}
+
+function findTask(id) {
+  for (const e of SCHEDULE) { const t = e.tasks.find(t=>t.id===id); if(t) return t; }
+  return null;
+}
+
+// ═══════════════════════════════════════════════
+//  MAINTENANCE — LOAD / SUBMIT
+// ═══════════════════════════════════════════════
+async function loadMaintSchedule() {
+  try {
+    const res = await apiFetch({ action:'getSchedule', email:currentUser.email, staffId:currentUser.staffId });
+    if (res.success) {
+      lastDoneMap = res.lastDone || {};
+      refreshMaintDashboard();
+      buildEquipList();
+    }
+  } catch(e) {}
+}
+
+async function loadMaintHistory() {
+  qs('hist-list').innerHTML = '<div class="no-records">Loading…</div>';
+  try {
+    const res = await apiFetch({ action:'getHistory', email:currentUser.email, staffId:currentUser.staffId });
+    if (res.success) {
+      histAllLogs = res.logs || [];
+      buildHistFilter();
+      renderHistory('all');
+    }
+  } catch(e) { qs('hist-list').innerHTML='<div class="no-records">Failed to load.</div>'; }
+}
+
+async function submitLog() {
+  const tasks = Object.keys(checkedTasks);
+  const date  = qs('log-date').value;
+  const by    = qs('log-by').value.trim();
+  const notes = qs('log-notes').value.trim();
+  if (!tasks.length) return;
+  if (!date) { modMsg('bad','Please select a date.'); return; }
+  if (!by)   { modMsg('bad','Please enter who performed these tasks.'); return; }
+  setBtn('log-submit-txt','log-submit-spin',true);
+  try {
+    const taskDetails = tasks.map(id => {
+      const t = findTask(id);
+      const e = SCHEDULE.find(e => e.tasks.some(tt=>tt.id===id));
+      return { id, task:t?.task||id, equipment:e?.name||'', freq:t?.freq||'' };
+    });
+    const res = await apiFetch({ action:'logMaintenance', email:currentUser.email, staffId:currentUser.staffId, tasks:taskDetails, date, performedBy:by, notes });
+    if (res.success) {
+      tasks.forEach(id => { lastDoneMap[id] = { date, by }; });
+      checkedTasks = {};
+      updateSubmitBar();
+      buildEquipList();
+      refreshMaintDashboard();
+      modMsg('ok', `${tasks.length} task${tasks.length!==1?'s':''} logged successfully.`);
+      setTimeout(()=>hide('log-msg'), 3000);
+    } else modMsg('bad', res.error||'Error saving.');
+  } catch(e) { modMsg('bad','Connection error.'); }
+  setBtn('log-submit-txt','log-submit-spin',false);
+}
+
+function modMsg(type, msg) {
+  const el = qs('log-msg');
+  el.textContent = msg; el.className = 'form-msg '+type; show('log-msg');
+}
+
+// ═══════════════════════════════════════════════
+//  MAINTENANCE — HISTORY
+// ═══════════════════════════════════════════════
+function buildHistFilter() {
+  const equips = [...new Set(histAllLogs.map(l => l.equipment))].sort();
+  const chips  = ['<button class="hist-chip active" onclick="filterHist(\'all\',this)">All Equipment</button>'];
+  equips.forEach(e => chips.push(`<button class="hist-chip" onclick="filterHist('${e.replace(/'/g,"\\'")}',this)">${e}</button>`));
+  qs('hist-filter').innerHTML = chips.join('');
+}
+
+function filterHist(equip, btn) {
+  histFilter = equip;
+  qs('hist-filter').querySelectorAll('.hist-chip').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderHistory(equip);
+}
+
+function renderHistory(equip) {
+  let logs = histAllLogs;
+  if (equip !== 'all') logs = logs.filter(l => l.equipment === equip);
+  if (!logs.length) { qs('hist-list').innerHTML='<div class="no-records">No history yet.</div>'; return; }
+  qs('hist-list').innerHTML = logs.slice(0,50).map(l => `
+    <div class="hist-card">
+      <div class="hist-hdr"><span class="hist-date">${l.date}</span><span class="hist-by">By ${l.performedBy}</span></div>
+      <div class="hist-equip">${l.equipment}</div>
+      ${l.tasks.map(t=>`<div class="hist-task-row">${t}</div>`).join('')}
+      ${l.notes?`<div class="hist-notes">"${l.notes}"</div>`:''}
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  MAINTENANCE — VIEW NAVIGATION
+// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+//  WATER METERS — FORM
+// ═══════════════════════════════════════════════
+function showWaterForm() {
+  hide('water-log-btn-wrap'); show('water-entry-form'); hide('wlc-msg');
+  WATER_METERS.forEach(m => {
+    const prev = waterPrev[m.id];
+    const el   = qs(`wlc-${m.id}-prev`);
+    if (!el) return;
+    el.innerHTML = prev
+      ? `Previous: <strong>${prev.reading.toLocaleString()} L</strong> <span style="color:var(--gray)">(${prev.date})</span>`
+      : 'Previous: <em style="color:var(--gray)">First reading</em>';
+  });
+  window.scrollTo({ top: qs('water-entry-form').offsetTop - 60, behavior:'smooth' });
+}
+function hideWaterForm() { show('water-log-btn-wrap'); hide('water-entry-form'); }
+
+async function submitWater() {
+  const date = qs('wlc-date').value;
+  const by   = qs('wlc-by').value.trim();
+  if (!date) { formMsg('wlc-msg','bad','Please select a date.'); return; }
+  if (!by)   { formMsg('wlc-msg','bad','Please enter who read the meters.'); return; }
+  const wm1 = numVal('wlc-wm1'), wm2 = numVal('wlc-wm2');
+  const wm3 = numVal('wlc-wm3'), wm4 = numVal('wlc-wm4');
+  if (wm1===null && wm2===null && wm3===null && wm4===null) {
+    formMsg('wlc-msg','bad','Enter at least one meter reading.'); return;
+  }
+  setBtn('wlc-submit-txt','wlc-submit-spin',true);
+  try {
+    const res = await apiFetch({
+      action:'submitWater', email:currentUser.email, staffId:currentUser.staffId,
+      date, readBy:by, wm1, wm2, wm3, wm4,
+      rawTank:numVal('wlc-raw'), roTank:numVal('wlc-ro'),
+      comments:qs('wlc-comments').value.trim()
+    });
+    if (res.success) {
+      formMsg('wlc-msg','ok','Water readings saved.');
+      clearWaterForm();
+      await loadWaterRecords();
+      setTimeout(hideWaterForm, 2000);
+    } else formMsg('wlc-msg','bad', res.error||'Error saving.');
+  } catch(e) { formMsg('wlc-msg','bad','Connection error.'); }
+  setBtn('wlc-submit-txt','wlc-submit-spin',false);
+}
+
+function clearWaterForm() {
+  ['wlc-wm1','wlc-wm2','wlc-wm3','wlc-wm4','wlc-raw','wlc-ro','wlc-comments'].forEach(id => {
+    const el = qs(id); if (el) el.value = '';
+  });
+  qs('wlc-date').value = todayISO();
+}
+
+// ═══════════════════════════════════════════════
+//  WATER METERS — RECORDS
+// ═══════════════════════════════════════════════
+async function loadWaterRecords() {
+  qs('water-records-list').innerHTML = '<div class="no-records">Loading…</div>';
+  try {
+    const res = await apiFetch({ action:'getWaterRecords', email:currentUser.email, staffId:currentUser.staffId });
+    if (res.success) {
+      if (res.records && res.records.length) {
+        const latest = res.records[0];
+        waterPrev = {};
+        WATER_METERS.forEach(m => {
+          if (latest[m.id] != null) waterPrev[m.id] = { reading: latest[m.id], date: latest.date };
+        });
+      }
+      waterToday = res.todayDone || false;
+      const statusEl = qs('water-today-status');
+      if (statusEl) {
+        statusEl.textContent = waterToday ? '✓ Readings logged today' : 'No readings logged yet today';
+        statusEl.style.color = waterToday ? 'var(--green)' : 'var(--gray)';
+      }
+      renderWaterRecords(res.records || []);
+    }
+  } catch(e) { qs('water-records-list').innerHTML = '<div class="no-records">Failed to load.</div>'; }
+}
+
+function renderWaterRecords(records) {
+  if (!records.length) { qs('water-records-list').innerHTML = '<div class="no-records">No readings yet.</div>'; return; }
+  qs('water-records-list').innerHTML = records.map((r, i) => {
+    const prev = records[i + 1];
+    const meterRows = WATER_METERS.map(m => {
+      const val = r[m.id];
+      if (val == null) return '';
+      let diffHtml = '';
+      if (prev && prev[m.id] != null) {
+        const diff = val - prev[m.id];
+        const sign = diff >= 0 ? '+' : '';
+        diffHtml = `<span class="elec-meter-diff up">${sign}${diff.toLocaleString()} L</span>`;
+      } else {
+        diffHtml = `<span class="elec-meter-diff first">First</span>`;
+      }
+      return `<div class="elec-meter-row">
+        <span class="elec-meter-lbl">${m.label} <span style="font-size:9px;color:#9ca3af">${m.sub}</span></span>
+        <span class="elec-meter-val">${val.toLocaleString()} L</span>
+        ${diffHtml}
+      </div>`;
+    }).filter(Boolean).join('');
+    const tanks = [
+      r.rawTank != null ? `<div class="tank-pill"><div class="tank-lbl">Raw Water</div><div class="tank-val">${fmtL(r.rawTank)}</div></div>` : '',
+      r.roTank  != null ? `<div class="tank-pill"><div class="tank-lbl">RO Tank</div><div class="tank-val">${fmtL(r.roTank)}</div></div>` : ''
+    ].filter(Boolean).join('');
+    return `<div class="elec-rec-item">
+      <div class="elec-rec-hdr">
+        <span class="elec-rec-date">${r.date}</span>
+        <span class="elec-rec-by">By ${r.readBy||'—'}</span>
+      </div>
+      <div>${meterRows}</div>
+      ${tanks ? `<div class="rec-tanks" style="margin-top:8px">${tanks}</div>` : ''}
+      ${r.comments ? `<div class="rec-comment" style="margin-top:6px">"${r.comments}"</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function switchMaintView(v) {
+  maintView = v;
+  ['dash','log','hist'].forEach(id=>{
+    qs('maint-'+id).classList.toggle('hidden', id!==v);
+    qs('maint-nav-'+id).classList.toggle('active', id===v);
+  });
+  if (v==='hist' && !histAllLogs.length) loadMaintHistory();
+}
+</script>
+</body>
+</html>
