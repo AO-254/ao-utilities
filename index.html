@@ -370,7 +370,7 @@ input.pres-warn{border-color:#fca5a5!important;background:#fef2f2!important;}
 <!-- ═══ LOADING ═══ -->
 <div id="pg-loading" class="loading-overlay">
   <div class="lg-spin"></div>
-  <p style="font-size:14px;opacity:.8">Water Treatment Monitor</p>
+  <p style="font-size:14px;opacity:.8">Utilities Tracker</p>
 </div>
 
 <!-- ═══ LOGIN ═══ -->
@@ -378,16 +378,16 @@ input.pres-warn{border-color:#fca5a5!important;background:#fef2f2!important;}
   <div class="modal-card">
     <div class="brand">
       <div class="brand-logo">💧</div>
-      <h1>Water Treatment</h1>
+      <h1>Utilities Tracker</h1>
       <p>Savannah Brands Co. Ltd</p>
+    </div>
+    <div class="fld">
+      <label>Full Name</label>
+      <input id="li-name" type="text" placeholder="Your full name" autocomplete="name">
     </div>
     <div class="fld">
       <label>Email Address</label>
       <input id="li-email" type="email" placeholder="your@email.com" autocomplete="email">
-    </div>
-    <div class="fld">
-      <label>Staff ID</label>
-      <input id="li-staffid" type="text" placeholder="e.g. SB169" autocomplete="off" style="text-transform:uppercase">
     </div>
     <button class="btn-primary" onclick="doLogin()">
       <span id="li-btn-txt">Continue</span>
@@ -1635,22 +1635,15 @@ async function apiFetch(payload) {
 // ═══════════════════════════════════════════════
 //  LOGIN
 // ═══════════════════════════════════════════════
-async function doLogin() {
-  const email   = qs('li-email').value.trim().toLowerCase();
-  const staffId = qs('li-staffid').value.trim().toUpperCase();
+function doLogin() {
+  const name  = qs('li-name').value.trim();
+  const email = qs('li-email').value.trim().toLowerCase();
   hide('li-err');
-  if (!email || !staffId) { showErr('li-err','Enter email and Staff ID.'); return; }
-  setBtn('li-btn-txt','li-spin',true);
-  try {
-    const res = await apiFetch({ action:'login', email, staffId });
-    if (res.success) {
-      currentUser = { email, staffId, name:res.name, dept:res.dept, role:res.role };
-      sessionStorage.setItem('wt_user', JSON.stringify(currentUser));
-      if (res.hasPin) { qs('pin-user-label').textContent=res.name||email; showPage('pg-pin'); pinBuffer=''; updateDots(); }
-      else bootApp();
-    } else showErr('li-err', res.error || 'Email or Staff ID not found.');
-  } catch(e) { showErr('li-err','Connection error. Try again.'); }
-  setBtn('li-btn-txt','li-spin',false);
+  if (!name)  { showErr('li-err','Please enter your name.'); return; }
+  if (!email) { showErr('li-err','Please enter your email.'); return; }
+  currentUser = { email, name, staffId: email };
+  sessionStorage.setItem('wt_user', JSON.stringify(currentUser));
+  bootApp();
 }
 
 // ═══════════════════════════════════════════════
@@ -1686,7 +1679,7 @@ function bootApp() {
   const initials = u.name ? u.name.split(' ').map(p=>p[0]).join('').toUpperCase().slice(0,2) : '??';
   qs('acct-av').textContent   = initials;
   qs('acct-name').textContent = u.name || u.email;
-  qs('acct-id').textContent   = `${u.staffId}${u.dept ? ' · '+u.dept : ''}`;
+  qs('acct-id').textContent   = u.email;
   qs('hdr-sub').textContent   = u.name ? `Hello, ${u.name.split(' ')[0]}` : 'Savannah Brands';
   qs('hdr-date').textContent  = new Date().toLocaleDateString('en-KE',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
   if (u.name) { qs('rf-checked').value = u.name; qs('ef-checked').value = u.name; qs('cf-checked').value = u.name; qs('log-by').value = u.name; qs('elc-by').value = u.name; qs('wlc-by').value = u.name; }
